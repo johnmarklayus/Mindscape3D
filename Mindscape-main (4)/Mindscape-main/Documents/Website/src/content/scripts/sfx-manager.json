@@ -1,0 +1,46 @@
+{
+  "id": "sfx-manager",
+  "title": "SFXManager.cs",
+  "path": "Assets/Scripts/Audio/SFXManager.cs",
+  "summary": "Mirrors MusicManager for one-shot sound effects, and additionally synthesizes its own UI click sound in code — no imported audio asset needed for that one.",
+  "notes": [
+    {
+      "match": "_source = gameObject.AddComponent<AudioSource>();",
+      "text": "Builds the synthesized click sound once at startup rather than every time it's played."
+    },
+    {
+      "match": "const float frequency = 880f;",
+      "text": "The envelope ramps linearly from 1 down to 0 across the clip's length, so the tone fades out smoothly instead of clipping abruptly."
+    },
+    {
+      "match": "public static SFXManager Instance { get; private set; }",
+      "span": 16,
+      "text": "Same self-bootstrapping singleton pattern as MusicManager, down to the exact polling approach for volume — the two classes are deliberately parallel."
+    },
+    {
+      "match": "_lastVolume = PlayerPrefs.GetFloat(VolumeKey, 0.65f);",
+      "span": 13,
+      "text": "Same volume-polling Update as MusicManager, just against the separate 'Mindscape.SFX' key."
+    },
+    {
+      "match": "public static void Play(AudioClip clip)",
+      "span": 5,
+      "text": "Public API for playing any arbitrary clip through the shared, volume-synced AudioSource — e.g. a footstep or pickup sound."
+    },
+    {
+      "match": "public static void Play(AudioClip clip)",
+      "span": 5,
+      "text": "Convenience wrapper specifically for the built-in UI click sound, used throughout MainMenuController."
+    },
+    {
+      "match": "static AudioClip BuildClickClip()",
+      "span": 20,
+      "text": "Generates a 60ms, 880Hz sine wave with a linear fade-out envelope, sample by sample, and hands it to Unity as a real AudioClip — a deliberate choice to avoid shipping (or needing someone to create) an audio asset just for button clicks."
+    },
+    {
+      "match": "float t = i / (float)sampleRate;",
+      "span": 3,
+      "text": "AudioClip.Create allocates an empty clip with the given format, then SetData fills it with the samples computed above."
+    }
+  ]
+}

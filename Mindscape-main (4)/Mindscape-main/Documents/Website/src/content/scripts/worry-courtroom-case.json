@@ -1,0 +1,44 @@
+{
+  "id": "worry-courtroom-case",
+  "title": "WorryCourtroomCase.cs",
+  "path": "Assets/Scripts/Minigames/WorryCourtroom/WorryCourtroomCase.cs",
+  "summary": "The data for one Worry Courtroom trial, as a ScriptableObject: the worry, the evidence cards, and the answer lists for each round. Create more from the Assets menu.",
+  "notes": [
+    {
+      "match": "public enum ThinkingTrap { None, MindReading, FortuneTelling, AllOrNothing, Catastrophizing, EmotionalReasoning, Labeling }",
+      "text": "The six thinking traps a guess card can be. A dropdown in the Inspector, so there are no typos."
+    },
+    {
+      "match": "public class EvidenceCard",
+      "text": "One card in the prosecution round: text, 'Is Fact', and which trap it is when it isn't."
+    },
+    {
+      "match": "public class AnswerOption",
+      "text": "One answer button: its text, whether it is the helpful one, and the explanation shown when it is picked wrongly."
+    },
+    {
+      "match": "[CreateAssetMenu(menuName = \"Mindscape/Worry Courtroom Case\", fileName = \"NewWorryCase\")]",
+      "text": "Adds Assets ▸ Create ▸ Mindscape ▸ Worry Courtroom Case."
+    },
+    {
+      "match": "public List<EvidenceCard> evidence = new List<EvidenceCard>();",
+      "text": "Prosecution: shown one at a time and sorted into fact or guess."
+    },
+    {
+      "match": "public List<AnswerOption> defence = new List<AnswerOption>();",
+      "text": "Defence: the player must pick the number of good facts set in Rules (three by default)."
+    },
+    {
+      "match": "public List<TrapInfo> trapInfo = DefaultTraps();",
+      "text": "The names and plain-language explanations of each trap, shown when a guess is spotted."
+    },
+    {
+      "match": "[TextArea(1, 3)] public string introLead;",
+      "text": "Optional per-case wording for the screen text. Blank means use the text on the component."
+    },
+    {
+      "match": "public TrapInfo FindTrap(ThinkingTrap t)",
+      "text": "Looks up a trap's display text, falling back to the enum name if the list has no entry."
+    }
+  ]
+}

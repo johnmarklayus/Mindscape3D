@@ -1,0 +1,118 @@
+{
+  "id": "pause-menu",
+  "title": "PauseMenu.cs",
+  "path": "Assets/Scripts/UI/PauseMenu.cs",
+  "summary": "The UI Toolkit Pause panel: pause/resume, a Settings sub-page with music/SFX volume sliders, and the Main Menu exit. A singleton like the Quest HUD.",
+  "notes": [
+    {
+      "match": "public static PauseMenu Instance { get; private set; }",
+      "text": "Singleton, same pattern as BagUIController/QuestHUDController."
+    },
+    {
+      "match": "private PlayerControls _player;",
+      "text": "Cached player reference, lazily resolved."
+    },
+    {
+      "match": "private InputAction _pauseAction;",
+      "text": "The actual TogglePause Input Action, resolved once Start runs."
+    },
+    {
+      "match": "PlayerControls Player => _player != null ? _player : (_player = FindAnyObjectByType<PlayerControls>());",
+      "text": "Lazy-resolving property — resolves and caches PlayerControls on first access rather than requiring an explicit Awake-time lookup."
+    },
+    {
+      "match": "SetVisible(false);",
+      "nth": 1,
+      "text": "Explicitly starts hidden regardless of whatever InitializeUI computed, since _isPaused defaults to false."
+    },
+    {
+      "match": "_btnMainMenu.clicked -= GoMainMenu;",
+      "text": "OpenSettings/BackToPauseMenu swap which 'page' element has the 'hidden' class rather than being two separate panels."
+    },
+    {
+      "match": "const string MusicKey = \"Mindscape.Music\";",
+      "span": 2,
+      "text": "PlayerPrefs keys shared with MainMenuController and MusicManager/SFXManager — all three read/write the same two keys so volume stays consistent everywhere."
+    },
+    {
+      "match": "private VisualElement _overlay;",
+      "span": 3,
+      "text": "The pause overlay actually has two 'pages': the main pause buttons, and a nested Settings page."
+    },
+    {
+      "match": "private Button _btnResume;",
+      "span": 5,
+      "text": "Resume, open-settings, go-to-main-menu, an alternate close (X) button, and a back-from-settings button."
+    },
+    {
+      "match": "private Slider _sliderMusic;",
+      "span": 4,
+      "text": "Music/SFX sliders plus the percentage labels next to them."
+    },
+    {
+      "match": "void Awake()",
+      "span": 9,
+      "text": "Standard singleton Awake."
+    },
+    {
+      "match": "void Start()",
+      "span": 10,
+      "text": "Beyond wiring the UI, Start also enables the Gameplay action map and grabs the dedicated TogglePause action (in addition to the raw Escape key checked in Update) — belt-and-suspenders input handling."
+    },
+    {
+      "match": "void InitializeUI()",
+      "span": 59,
+      "text": "Same 'query every named element once, wire click handlers with -= before += ' pattern as BagUIController.InitializeUI, just for the pause panel's own buttons."
+    },
+    {
+      "match": "BindVolumeSlider(_sliderMusic, _labelMusicValue, MusicKey, 0.65f);",
+      "span": 2,
+      "text": "Sliders are bound to persisted PlayerPrefs volume values via the shared BindVolumeSlider helper."
+    },
+    {
+      "match": "void BindVolumeSlider(Slider slider, Label label, string prefKey, float defaultVal)",
+      "span": 15,
+      "text": "Reads the current PlayerPref value into the slider without firing its change event (SetValueWithoutNotify), then wires a callback that updates the label and re-persists on every future change."
+    },
+    {
+      "match": "void Update()",
+      "span": 23,
+      "text": "Escape handling lives here (not in PlayerControls) because pause needs first refusal: it won't fire while Tasks is open, and if the Settings sub-page is showing, Escape backs out of Settings instead of resuming gameplay outright."
+    },
+    {
+      "match": "public void TogglePause()",
+      "span": 4,
+      "text": "Public toggle, called by the HUD menu button."
+    },
+    {
+      "match": "public void Resume()",
+      "span": 4,
+      "text": "Public explicit-close, used by TutorialManager to force it shut."
+    },
+    {
+      "match": "public void OpenSettings()",
+      "span": 5,
+      "text": "Switches to the Settings sub-page by toggling which page has the 'hidden' class."
+    },
+    {
+      "match": "public void BackToPauseMenu()",
+      "span": 4,
+      "text": "Public 'go back from settings' — same underlying ShowPausePanel used when opening pause fresh."
+    },
+    {
+      "match": "void ShowPausePanel()",
+      "span": 5,
+      "text": "Shared helper: whichever page should be visible, un-hide it and hide the other."
+    },
+    {
+      "match": "public void GoMainMenu()",
+      "span": 7,
+      "text": "Quitting to the main menu clears the 'resume where you left off' pref, restores time scale (in case the game was paused via Time.timeScale elsewhere), and loads the MainMenu scene by name."
+    },
+    {
+      "match": "public void SetVisible(bool visible)",
+      "span": 24,
+      "text": "The core visibility toggle: flips the USS 'hidden' class, always resets back to the top-level pause page when opening, syncs PlayerControls.pauseOpen (which is what actually blocks movement/camera), and locks/unlocks + shows/hides the OS cursor."
+    }
+  ]
+}

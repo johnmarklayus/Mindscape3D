@@ -1,0 +1,43 @@
+{
+  "id": "mobile-input",
+  "title": "MobileInput.cs",
+  "path": "Assets/Scripts/Input/MobileInput.cs",
+  "summary": "Static bridge from the on-screen joystick/Interact button to the same signals keyboard input already produces, so gameplay scripts never need a separate 'mobile' code path, including the View button that switches between third and first person.",
+  "notes": [
+    {
+      "match": "static bool _interactPressed;",
+      "text": "One-frame pulse flag for the Interact button, analogous to WasPressedThisFrame()."
+    },
+    {
+      "match": "public static bool InteractPressed => _interactPressed;",
+      "text": "Read-only accessor — nothing outside this class should be able to set _interactPressed directly except TriggerInteract."
+    },
+    {
+      "match": "public static void TriggerInteract()",
+      "span": 4,
+      "text": "Called once by the Interact button's onClick — sets the pulse flag that every interaction script checks this frame."
+    },
+    {
+      "match": "_interactPressed = false;",
+      "span": 4,
+      "text": "Reset at the end of every frame so the pulse only counts for the frame the button was actually pressed, not forever after."
+    },
+    {
+      "match": "static Vector2 _moveAxis;",
+      "text": "The current movement stick position, a Vector2 from the on-screen joystick."
+    },
+    {
+      "match": "public static void SetMoveAxis(Vector2 axis)",
+      "text": "Called continuously by MobileJoystick while dragging, and with Vector2.zero on release."
+    },
+    {
+      "match": "_moveAxis = axis.sqrMagnitude > 1f ? axis.normalized : axis;",
+      "text": "Clamp to length 1 so dragging past the edge of the stick never moves faster than full speed."
+    },
+    {
+      "match": "public static void TriggerViewToggle() => _viewPressed = true;",
+      "span": 2,
+      "text": "The on-screen VIEW button sets this latch; PlayerMovement consumes it once per frame and toggles first person. A latch (read and cleared by the consumer) is used instead of a per-frame flag so the press survives whichever LateUpdate happens to run first."
+    }
+  ]
+}

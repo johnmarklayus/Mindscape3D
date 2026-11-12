@@ -1,0 +1,119 @@
+{
+  "id": "collectibles-manager",
+  "title": "CollectiblesManager.cs",
+  "path": "Assets/Scripts/Interaction/CollectiblesManager.cs",
+  "summary": "Per-scene manager: tracks every CollectibleItem, shows the 'F to collect' prompt for whichever is nearest, and keeps the per-item counts that Quests read through GetItemCount.",
+  "notes": [
+    {
+      "match": "[SerializeField] Transform player;",
+      "text": "Auto-resolved by name ('Player') in Awake if not assigned."
+    },
+    {
+      "match": "[SerializeField] Canvas promptCanvas;",
+      "text": "Canvas the floating 'F to collect' prompt is parented under."
+    },
+    {
+      "match": "[SerializeField] List<CollectibleItem> collectiblePrefabs = new List<CollectibleItem>();",
+      "text": "A convenient place to list which prefabs this scene's collectibles use; not read by the runtime logic itself."
+    },
+    {
+      "match": "[SerializeField] string collectPrompt = \"F to collect\";",
+      "text": "Default prompt text; the live text adds the item's display name."
+    },
+    {
+      "match": "readonly Dictionary<string, int> itemCounts = new Dictionary<string, int>();",
+      "text": "What the player has collected, by item ID. This is what Quests read — the old Bag panel no longer exists."
+    },
+    {
+      "match": "public int CollectedCount => collectedCount;",
+      "text": "Total pickups this scene, for any HUD counter that wants it."
+    },
+    {
+      "match": "public int GetItemCount(string itemId)",
+      "text": "Quest.AreCollectiblesComplete() calls this with each required ID. Unknown or empty IDs return 0."
+    },
+    {
+      "match": "GameObject playerObject = GameObject.Find(\"Player\");",
+      "text": "Falls back to a GameObject literally named \"Player\" if nothing was wired in the Inspector."
+    },
+    {
+      "match": "promptCanvas = FindAnyObjectByType<Canvas>();",
+      "text": "Falls back to the first Canvas in the scene for the prompt text."
+    },
+    {
+      "match": "CreatePrompt();",
+      "text": "Builds the on-screen prompt text object in code instead of requiring a pre-built prefab."
+    },
+    {
+      "match": "promptText.font = MinigameUI.Font(true);",
+      "text": "Uses the shared Comic Neue Bold font, matching the rest of the game's UI theme."
+    },
+    {
+      "match": "CacheSceneItems();",
+      "text": "Scans the scene once for every CollectibleItem and registers itself as their manager."
+    },
+    {
+      "match": "if (NPCInteractionManager.DialogueActive || NPCInteractionManager.HasNearbyNPC ||",
+      "span": 7,
+      "text": "Suppresses the pickup prompt while a conversation is active, an NPC is nearby, or the Quest Journal is open."
+    },
+    {
+      "match": "nearbyItem = FindNearbyItem();",
+      "text": "Finds whichever in-range collectible is closest to the player, or null."
+    },
+    {
+      "match": "promptText.text = \"F to collect  •  \" + nearbyItem.DisplayName;",
+      "text": "Shows the specific item's display name in the prompt."
+    },
+    {
+      "match": "bool interactPressed = (Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame) || MobileInput.InteractPressed;",
+      "text": "Same keyboard-OR-mobile pattern used across every interactable."
+    },
+    {
+      "match": "nearbyItem.Collect();",
+      "text": "The item calls back into Collect(item) below."
+    },
+    {
+      "match": "CollectibleItem[] sceneItems = FindObjectsByType<CollectibleItem>(FindObjectsInactive.Include);",
+      "text": "Includes inactive objects, so items already collected (and hidden) stay tracked."
+    },
+    {
+      "match": "sceneItems[i].manager = this;",
+      "text": "Each item is told who its manager is, so item.Collect() can route here."
+    },
+    {
+      "match": "CollectibleItem FindNearbyItem()",
+      "span": 23,
+      "text": "Linear nearest-neighbour search over all tracked items — fine at this scale; also prunes any destroyed items it finds."
+    },
+    {
+      "match": "public void Collect(CollectibleItem item)",
+      "span": 9,
+      "text": "Called by CollectibleItem.Collect(): bumps the total and that item ID's count, then plays the shrink-away animation."
+    },
+    {
+      "match": "if (!string.IsNullOrEmpty(id)) itemCounts[id] = GetItemCount(id) + 1;",
+      "text": "This one line is what makes a Quest's 'collect X' requirement turn true."
+    },
+    {
+      "match": "const float duration = 0.55f;",
+      "text": "Length of the shrink-away animation, in seconds."
+    },
+    {
+      "match": "colliders[i].enabled = false;",
+      "text": "Disable the item's colliders immediately so it can't be collected twice mid-animation."
+    },
+    {
+      "match": "float eased = 1f - Mathf.Pow(1f - t, 3f);",
+      "text": "1 - (1-t)^3 is a standard 'ease-out cubic' — fast start, gentle settle at the end."
+    },
+    {
+      "match": "itemTransform.localScale = Vector3.Lerp(startScale, Vector3.one * 0.08f, eased);",
+      "text": "Shrinks the item to almost nothing."
+    },
+    {
+      "match": "item.gameObject.SetActive(false);",
+      "text": "Hidden, not destroyed, so it remains a real GameObject for quest and save logic."
+    }
+  ]
+}

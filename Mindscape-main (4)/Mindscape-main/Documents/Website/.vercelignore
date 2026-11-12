@@ -1,0 +1,16 @@
+public/game-builds/0920-apk_BackUpThisFolder_ButDontShipItWithYourGame
+public/game-builds/mindscape-3d_BurstDebugInformation_DoNotShip
+public/game-builds/0920/mindscape-3d_BurstDebugInformation_DoNotShip
+public/game-builds/0920-apk.apk
+# Vercel rejects files over 100 MB: these APKs cannot be hosted here
+public/game-builds/2026-10-15/Mindscape.apk
+public/game-builds/2026-10-17/Mindscape.apk
+dist
+
+# 2026-11-06 build
+public/game-builds/2026-11-06/*.apk
+
+# Never upload APKs (over 100 MB) or Unity build leftovers
+*.apk
+**/*DoNotShip*
+**/*ButDontShipItWithYourGame*

@@ -1,0 +1,143 @@
+{
+  "id": "npc-interaction-manager",
+  "title": "NPCInteractionManager.cs",
+  "path": "Assets/Scripts/Dialogue/NPCInteractionManager.cs",
+  "summary": "The single per-scene conversation manager: finds the nearest NPC, drives the conversation panel and talk prompt (UI Toolkit files found through Resources/EpisodeUI), blends a dedicated conversation camera, and reports completed talks to the Quest system.",
+  "notes": [
+    {
+      "match": "[DefaultExecutionOrder(-20)]",
+      "text": "Runs its Awake very early (-20) so DialogueActive/HasNearbyNPC and the UI exist before other scripts' Awake methods might check them."
+    },
+    {
+      "match": "[SerializeField] Transform player;",
+      "text": "Optional. If left empty, Awake finds the PlayerControls in the scene and uses its transform."
+    },
+    {
+      "match": "[SerializeField] Camera dialogueCamera;",
+      "text": "The camera that actually moves during conversations; defaults to Camera.main."
+    },
+    {
+      "match": "if (dialogueCamera == null) dialogueCamera = Camera.main;",
+      "text": "Falls back to the main camera if no dedicated dialogue camera was assigned."
+    },
+    {
+      "match": "nearbyNPC = FindNearestNPC();",
+      "text": "Finds the closest in-range NPC every frame — cheap at this scale."
+    },
+    {
+      "match": "QuestHUDController.Instance?.Close();",
+      "text": "QuestHUDController is closed explicitly here too, in case the player opened the journal from elsewhere right before this fires."
+    },
+    {
+      "match": "conversationRoutine = StartCoroutine(TurnTowardPlayerThenTalk(npc));",
+      "text": "Any previous conversation coroutine is stopped first — guards against double-starting if BeginDialogue is somehow called twice."
+    },
+    {
+      "match": "string stressSuffix = Mathf.Approximately(selectedChoice.stressChange, 0f)",
+      "text": "Formats the stress delta as a signed number (+3 / -3) appended to the choice's button label, purely as player feedback."
+    },
+    {
+      "match": "public static bool DialogueActive { get; private set; }",
+      "span": 2,
+      "text": "Static, globally-readable flags other scripts (CollectiblesManager, Quest evaluation) check to know if a conversation or nearby NPC should suppress their own behavior."
+    },
+    {
+      "match": "NPC nearbyNPC;",
+      "span": 10,
+      "text": "Runtime state: which NPC is nearby vs. actively talking, cached UI element references, the camera's pre-conversation pose (to restore afterward), and the two coroutines this script juggles."
+    },
+    {
+      "match": "void Awake()",
+      "span": 9,
+      "text": "Resolves the player reference either way (explicit Transform, or via PlayerControls) and grabs its PlayerControls component either way."
+    },
+    {
+      "match": "CacheNPCs();",
+      "text": "Scans the scene for NPCs once, then CreateUI finds the dialogue panel and talk prompt (UI Toolkit files, see CreateUI)."
+    },
+    {
+      "match": "void OnDestroy()",
+      "span": 4,
+      "text": "Resets the static flags on destroy — otherwise they could stay 'stuck' true if this manager is torn down mid-conversation (e.g. scene unload)."
+    },
+    {
+      "match": "if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)",
+      "span": 8,
+      "text": "Escape cancels an active conversation early (completedConversation = false, so it does NOT count as a completed talk for Quest purposes). In the redesigned panel the number keys 1 to 9 pick a reply."
+    },
+    {
+      "match": "if (promptText != null)",
+      "span": 5,
+      "text": "Drives the 'F to talk' prompt visibility and text."
+    },
+    {
+      "match": "void CacheNPCs()",
+      "span": 5,
+      "text": "FindObjectsByType with FindObjectsInactive.Exclude — only active NPCs are conversation candidates."
+    },
+    {
+      "match": "NPC FindNearestNPC()",
+      "span": 22,
+      "text": "Same lazy-prune-while-searching nearest-neighbor pattern as CollectiblesManager.FindNearbyItem."
+    },
+    {
+      "match": "public void BeginDialogue(NPC npc)",
+      "span": 28,
+      "text": "Kicks off a conversation: locks in which NPC is 'active', closes the other overlays (tasks, journal) so only dialogue is visible, remembers the camera's original pose to restore later, and starts the turn-then-talk coroutine."
+    },
+    {
+      "match": "IEnumerator TurnTowardPlayerThenTalk(NPC npc)",
+      "span": 14,
+      "text": "Turns the NPC to face the player first (visually), and only opens the actual dialogue panel/camera once that turn finishes — but bails cleanly if the conversation was ended (e.g. via Escape) while the turn was still animating."
+    },
+    {
+      "match": "void ShowDialogueNode(int index)",
+      "span": 40,
+      "text": "The dialogue state machine for one node: shows the NPC's line, then either lists every branching choice (if chaining is enabled) or a single Continue/Goodbye button."
+    },
+    {
+      "match": "playerControls.ChangeStress(selectedChoice.stressChange);",
+      "span": 4,
+      "text": "Applies the choice's stress change, then either ends the conversation or jumps to another node — this is the entire 'branching dialogue tree' mechanic."
+    },
+    {
+      "match": "void FocusCamera(NPC npc)",
+      "span": 9,
+      "text": "Computes where the conversation camera should sit (in front of the NPC's face, offset by its configured distance and height) and starts blending toward it. ShotFocus.Set tells the player's body to step out of the shot while you talk."
+    },
+    {
+      "match": "IEnumerator BlendCamera(Vector3 targetPosition, Quaternion targetRotation)",
+      "span": 16,
+      "text": "A time-based camera blend using SmoothStep for ease-in/ease-out, running on unscaled time so it isn't affected by Time.timeScale (e.g. during a paused game-over screen)."
+    },
+    {
+      "match": "public void EndDialogue(bool completedConversation = true)",
+      "span": 13,
+      "text": "Ends the conversation: hides the panel, stops both coroutines, restores the camera to its pre-conversation pose, and starts a coroutine to turn the NPC back and finalize state."
+    },
+    {
+      "match": "IEnumerator FinishDialogue(NPC npc, bool completedConversation)",
+      "span": 15,
+      "text": "After turning the NPC back to its resting rotation, clears every dialogue flag and — only if the conversation actually completed normally — reports it to the Quest system via QuestProgress."
+    },
+    {
+      "match": "IEnumerator RotateNPC(Transform npcTransform, Quaternion targetRotation, float duration)",
+      "span": 21,
+      "text": "Shared rotation-tweening helper used both to turn the NPC toward the player at the start and back to its resting rotation at the end."
+    },
+    {
+      "match": "void CreateUI()",
+      "text": "Finds the two UI Toolkit pieces through Resources/EpisodeUI: the \"[ F ]  Talk to\" prompt (InteractPrompt.uxml, shared with the episodes' [ E ] prompt) and the conversation panel (NPCDialogue.uxml; a scene can override it with dialogueOverride). It only looks up the named elements, so the layout is edited in UI Builder.",
+      "span": 1
+    },
+    {
+      "match": "if (Paused || (playerControls != null && (playerControls.questOpen || playerControls.minigameOpen || storyLocked)))",
+      "span": 6,
+      "text": "Nearby-NPC detection is suspended while the Quest Journal or a minigame is open, the game is paused, or a story scene has the player locked (a cutscene or story dialogue), so a conversation never fights the story for the camera."
+    },
+    {
+      "match": "void SetPrompt(bool visible)",
+      "text": "The talk prompt is a plate (background + label); it is shown or hidden with the .hidden class, not by toggling the text."
+    }
+  ]
+}

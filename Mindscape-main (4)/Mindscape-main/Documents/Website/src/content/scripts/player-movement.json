@@ -1,0 +1,255 @@
+{
+  "id": "player-movement",
+  "title": "PlayerMovement.cs",
+  "path": "Assets/Scripts/Player/PlayerMovement.cs",
+  "summary": "Ground movement, the free orbit camera (with collision, scroll / button zoom and a first-person view), touch look for mobile, cursor locking, a stuck-in-geometry safety net, and the crosshair dot. Freezes whenever PlayerControls.IsOverlayOpen() is true.",
+  "notes": [
+    {
+      "match": "[RequireComponent(typeof(CharacterController))]",
+      "text": "Movement needs a CharacterController to actually move the GameObject."
+    },
+    {
+      "match": "[RequireComponent(typeof(PlayerInputBindings))]",
+      "text": "Needs the input bindings sibling — same requirement as PlayerControls."
+    },
+    {
+      "match": "public Animator animator;",
+      "text": "Assigned automatically from a child if left empty; drives the 'Speed' float for blend trees."
+    },
+    {
+      "match": "public float runSpeed = 8f;",
+      "text": "Speed multiplier while the Run action is held."
+    },
+    {
+      "match": "_input = GetComponent<PlayerInputBindings>();",
+      "text": "Falls back to searching child objects if no Animator was assigned in the Inspector."
+    },
+    {
+      "match": "BuildCrosshair();",
+      "text": "Spawns the crosshair dot from the shared Crosshair.uxml (UI Toolkit) once at startup. showCrosshair, crosshairSize and crosshairColor below still style it."
+    },
+    {
+      "match": "HandleCursor();",
+      "text": "Cursor lock/visibility is updated even while overlays block movement, so menus are usable."
+    },
+    {
+      "match": "bool IsOverlayOpen() => _hud != null && _hud.IsOverlayOpen();",
+      "text": "Expression-bodied helper — avoids repeating the null-check everywhere."
+    },
+    {
+      "match": "moveInput += MobileInput.MoveAxis;",
+      "text": "The on-screen joystick's input is simply added on top of keyboard/gamepad input — see MobileInput.cs."
+    },
+    {
+      "match": "if (moveInput.sqrMagnitude > 1f) moveInput.Normalize();",
+      "text": "Clamp the combined vector so diagonal keyboard+mobile input can't move faster than intended."
+    },
+    {
+      "match": "Vector3 input = new Vector3(moveInput.x, 0f, moveInput.y).normalized;",
+      "text": "Remaps the 2D input onto the XZ ground plane (Y up is height, not used here)."
+    },
+    {
+      "match": "bool moving = moveDir.sqrMagnitude > 0.01f;",
+      "text": "sqrMagnitude avoids a sqrt just to check 'basically zero'."
+    },
+    {
+      "match": "bool running = moving && _input.Run != null && _input.Run.IsPressed();",
+      "text": "Running requires both movement input and the Run action held."
+    },
+    {
+      "match": "_controller.Move((moveDir * speed + _verticalVelocity) * Time.deltaTime);",
+      "text": "One Move call for walking and falling together. Two separate calls (sideways, then vertical) make the controller stop dead against a wall or kerb instead of sliding along it. Move takes a world-space displacement for this frame, not a velocity."
+    },
+    {
+      "match": "_verticalVelocity.y += gravity * Time.deltaTime;",
+      "text": "Standard gravity accumulation."
+    },
+    {
+      "match": "cameraOffset.z = Mathf.Clamp(cameraOffset.z, -maxDistance, -minDistance);",
+      "text": "Distance clamped to the configured min/max (note the offset is negative — behind the player)."
+    },
+    {
+      "match": "Vector3 thirdPos = _snapCamera ? desiredPos : Vector3.Lerp(cameraTransform.position, desiredPos, cameraFollowSpeed * Time.deltaTime);",
+      "text": "The third-person position eases toward the desired spot instead of snapping, which is what makes the camera feel springy. After a ResetView (a cinematic reposition) it snaps once instead."
+    },
+    {
+      "match": "Quaternion lookRotation = Quaternion.LookRotation(targetPos - cameraTransform.position + rotation * Vector3.forward * 0.0001f);",
+      "text": "Third person looks at the target point (above the head) wherever collision pulled the camera. The tiny forward term keeps the rotation defined when the camera sits exactly on the target while blending into first person."
+    },
+    {
+      "match": "if (Mouse.current == null) return;",
+      "text": "No mouse connected (e.g. touch-only) — skip cursor handling entirely."
+    },
+    {
+      "match": "if (distance <= 0.01f)",
+      "text": "If the desired position is basically at the target already, there's nothing to resolve."
+    },
+    {
+      "match": "Vector3 direction = toCamera / distance;",
+      "text": "Normalized direction toward the desired camera position, used for the sphere cast and the pull-in math."
+    },
+    {
+      "match": "public float moveSpeed = 5f;",
+      "span": 3,
+      "text": "Base walking speed, how fast the character turns to face movement direction, and downward acceleration."
+    },
+    {
+      "match": "public Transform cameraTransform;",
+      "span": 10,
+      "text": "Third-person shoulder-cam tuning: offset from the player, follow smoothing, mouse sensitivity, pitch clamp, and how aggressively it avoids clipping through walls."
+    },
+    {
+      "match": "public float zoomSpeed = 5f;",
+      "span": 3,
+      "text": "Zoom-in/out distance bounds, adjusted live by ZoomIn/ZoomOut input."
+    },
+    {
+      "match": "public bool showCrosshair = true;",
+      "span": 3,
+      "text": "The crosshair is a UI Toolkit element (Crosshair.uxml), not drawn with OnGUI. These fields control whether it shows, how big, and what color."
+    },
+    {
+      "match": "animator = GetComponentInChildren<Animator>();",
+      "span": 3,
+      "text": "Root motion is disabled — movement is driven entirely by CharacterController.Move, not animation curves."
+    },
+    {
+      "match": "else",
+      "nth": 1,
+      "span": 2,
+      "text": "Warns in the console if there's genuinely no Animator anywhere, since Speed-driven blend trees won't animate."
+    },
+    {
+      "match": "if (cameraTransform == null && Camera.main != null)",
+      "span": 2,
+      "text": "Defaults to the main camera if one wasn't wired up manually."
+    },
+    {
+      "match": "if (cameraTransform != null)",
+      "span": 2,
+      "text": "Seeds the starting yaw from the player's current facing so the camera doesn't snap on the first frame."
+    },
+    {
+      "match": "if (IsOverlayOpen())",
+      "nth": 1,
+      "span": 6,
+      "text": "Any overlay open (tasks, pause, dialogue, journal, minigame) freezes the animator's Speed to 0 and skips movement entirely."
+    },
+    {
+      "match": "if (IsOverlayOpen())",
+      "nth": 2,
+      "span": 2,
+      "text": "Any overlay open (tasks, pause, dialogue, journal, minigame) freezes the animator's Speed to 0 and skips movement entirely."
+    },
+    {
+      "match": "// The Move action is a 2D composite: x = right-left, y = up-down (see GameControls.inputactions).",
+      "span": 2,
+      "text": "Move is a Vector2: x is left/right, y is forward/back, straight from the Input System composite binding."
+    },
+    {
+      "match": "Quaternion yawRotation = Quaternion.Euler(0f, _yaw, 0f);",
+      "span": 3,
+      "text": "Converts world-relative input into camera-relative movement using the current yaw."
+    },
+    {
+      "match": "if (animator != null)",
+      "nth": 3,
+      "span": 2,
+      "text": "Feeds the Animator: 0 = idle, 1 = walk, 2 = run."
+    },
+    {
+      "match": "if (_controller.isGrounded && _verticalVelocity.y < 0f)",
+      "span": 2,
+      "text": "A small constant downward push (not 0) keeps isGrounded reliably true on ramps — resetting to exactly 0 causes it to flicker."
+    },
+    {
+      "match": "if (_input.ZoomIn != null && _input.ZoomIn.IsPressed()) zoom += zoomSpeed * Time.deltaTime;",
+      "span": 4,
+      "text": "Zoom comes from the ZoomIn / ZoomOut keys and from the scroll wheel or a two-finger trackpad swipe, summed into one signed amount for this frame."
+    },
+    {
+      "match": "Quaternion rotation = Quaternion.Euler(_pitch, _yaw, 0f);",
+      "span": 5,
+      "text": "Builds the desired camera position from pitch/yaw/target height/shoulder offset, then asks ResolveCameraCollision to pull it in front of any geometry."
+    },
+    {
+      "match": "Cursor.lockState = CursorLockMode.None;",
+      "span": 4,
+      "text": "Overlay open: show and unlock the OS cursor so menus/buttons are clickable."
+    },
+    {
+      "match": "Cursor.lockState = CursorLockMode.Locked;",
+      "span": 2,
+      "text": "Otherwise: lock and hide the cursor for mouselook."
+    },
+    {
+      "match": "Vector3 toCamera = desiredPos - targetPos;",
+      "span": 4,
+      "text": "SphereCastAll finds every collider between the player's chest and the desired camera position."
+    },
+    {
+      "match": "float nearestDistance = distance;",
+      "span": 10,
+      "text": "Walks every hit, skipping the player's own colliders, to find the closest obstruction."
+    },
+    {
+      "match": "if (nearestDistance < distance)",
+      "span": 2,
+      "text": "If something is in the way, place the camera just in front of it (minus a small padding) instead of at the full desired distance."
+    },
+    {
+      "match": "public const string FirstPersonKey = \"Mindscape.FirstPerson\";",
+      "text": "The saved view choice. The scroll wheel, the mobile VIEW button and the Settings toggle all write this PlayerPrefs key, so the next scene starts in the same view."
+    },
+    {
+      "match": "public bool allowFirstPerson = true;",
+      "span": 3,
+      "text": "Scrolling in past the closest third-person distance switches to first person; scrolling out switches back. Turn this off in a scene that should stay third person."
+    },
+    {
+      "match": "public float firstPersonEyeHeight = 0f;",
+      "text": "Eye height above the feet in first person. 0 measures the character model instead. The orbit camera's target height sits above the head, so it cannot be reused for the eyes."
+    },
+    {
+      "match": "_eyeHeight = MeasureEyeHeight();",
+      "text": "Measured once at start-up."
+    },
+    {
+      "match": "float MeasureEyeHeight()",
+      "span": 6,
+      "text": "Reads the skinned mesh's bounds and takes 93% of the height above the feet, a little below the top of the head. It scales with the player, so a scene that enlarges the character needs no extra tuning."
+    },
+    {
+      "match": "void SetFirstPerson(bool on)",
+      "span": 6,
+      "text": "The one place the view flag changes: it saves the choice to PlayerPrefs, so every way of switching (scroll, button, setting) stays in step."
+    },
+    {
+      "match": "bool viewButton = MobileInput.ConsumeViewToggle();   // the on-screen View button (mobile controls)",
+      "text": "The mobile VIEW button is a latch in MobileInput that this reads once per frame (a latch rather than a per-frame flag, so the press survives whichever LateUpdate runs first). It toggles the view the same way scrolling does."
+    },
+    {
+      "match": "ShotFocus.FirstPerson = _firstPerson;",
+      "text": "Tells ShotFocus the camera is at the eyes so it can keep the body, and anything carried, out of the view (also during story shots taken from near the player)."
+    },
+    {
+      "match": "cameraTransform.position = eyePos;",
+      "text": "Fully in first person: the camera sits at the eyes, looks along yaw and pitch, and the body turns with the view. While blending (viewSwitchSpeed) the third-person pose slides to the eye position and the rotation is slerped."
+    },
+    {
+      "match": "void CheckStuck(bool moving, Vector3 moveDir, float speed, Vector3 before)",
+      "span": 18,
+      "text": "Safety net for snagged corners: if walking is asked for but the player has not moved for a second, nudge them out along the surface they were pressing into and log which collider it was. Walking straight into a flat wall is not a snag."
+    },
+    {
+      "match": "Vector2 ReadLook()",
+      "span": 20,
+      "text": "Camera turn for this frame in degrees: pointer delta (mouse or trackpad), scroll tilt, arrow keys and gamepad stick, plus the on-screen look stick and finger drags in mobile mode. In mobile mode the Look action's pointer delta is ignored, because a finger on a stick would otherwise also swing the camera."
+    },
+    {
+      "match": "Vector2 TouchDragLook()",
+      "span": 16,
+      "text": "Mobile: a finger dragged on open screen orbits the camera. Touches that start on a stick or a button (StartsOnUI) belong to that control and are ignored here."
+    }
+  ]
+}

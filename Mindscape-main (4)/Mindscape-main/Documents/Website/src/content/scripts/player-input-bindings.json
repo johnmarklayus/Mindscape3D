@@ -1,0 +1,31 @@
+{
+  "id": "player-input-bindings",
+  "title": "PlayerInputBindings.cs",
+  "path": "Assets/Scripts/Input/PlayerInputBindings.cs",
+  "summary": "Resolves every gameplay Input Action once and exposes them as properties, so PlayerMovement/PlayerControls never need to know action names or enable the map themselves.",
+  "notes": [
+    {
+      "match": "var gameplay = KeyBindings.Gameplay;",
+      "text": "Fetches the shared 'Gameplay' action map from the static KeyBindings helper (one InputActionAsset for the whole game)."
+    },
+    {
+      "match": "Move = gameplay.FindAction(\"Move\");",
+      "text": "Action maps must be explicitly enabled before they start producing input — nothing else in the project calls Enable() for Gameplay."
+    },
+    {
+      "match": "public InputAction Move { get; private set; }",
+      "span": 8,
+      "text": "Every action other scripts might need, exposed read-only — callers can .ReadValue()/.IsPressed()/.WasPressedThisFrame() on these directly."
+    },
+    {
+      "match": "if (gameplay == null)",
+      "span": 5,
+      "text": "If the input actions asset failed to load, log a clear error and bail rather than throwing null-reference exceptions later."
+    },
+    {
+      "match": "Run = gameplay.FindAction(\"Run\");",
+      "span": 8,
+      "text": "Look up each action by name once, cached as a property for the rest of the object's life — cheap to call FindAction() once, wasteful to call it every frame."
+    }
+  ]
+}

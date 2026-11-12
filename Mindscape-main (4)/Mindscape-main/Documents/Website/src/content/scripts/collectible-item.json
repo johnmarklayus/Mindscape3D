@@ -1,0 +1,91 @@
+{
+  "id": "collectible-item",
+  "title": "CollectibleItem.cs",
+  "path": "Assets/Scripts/Interaction/CollectibleItem.cs",
+  "summary": "Per-item data and pickup logic for a single collectible: its stable ID, display name, and the 3D model swap-and-refresh pattern shared with NPC.cs.",
+  "notes": [
+    {
+      "match": "public string itemId = \"collectible\";",
+      "text": "Stable identifier a Quest's collectible requirement matches against — keep this constant even if the display name changes."
+    },
+    {
+      "match": "[FormerlySerializedAs(\"displayName\")]",
+      "text": "FormerlySerializedAs preserves existing scene data after the field was renamed from 'displayName' to 'collectibleName'."
+    },
+    {
+      "match": "[Tooltip(\"Prefab or imported model displayed for this collectible.\")]",
+      "text": "Whatever visual prefab represents this item in the world (swappable via 'Refresh 3D Model' in the custom Inspector)."
+    },
+    {
+      "match": "[Header(\"Interaction\")]",
+      "text": "How close the player must be to pick this up."
+    },
+    {
+      "match": "public float interactionRadius = 2.25f;",
+      "text": "Runtime flag — true once picked up; also exposed in Play mode via the custom Inspector."
+    },
+    {
+      "match": "[HideInInspector] public CollectiblesManager manager;",
+      "text": "Set by CollectiblesManager when it catalogs scene items — not meant to be assigned manually."
+    },
+    {
+      "match": "[HideInInspector] public CollectiblesManager manager;",
+      "text": "Tracks the currently-instantiated visual model so RefreshModel can clean up the old one first."
+    },
+    {
+      "match": "public string DisplayName => string.IsNullOrWhiteSpace(collectibleName)",
+      "span": 2,
+      "text": "Falls back to a generic label if no name was set, so the prompt text is never blank."
+    },
+    {
+      "match": "if (manager == null)",
+      "span": 2,
+      "text": "Finds the scene's CollectiblesManager automatically if this item wasn't explicitly registered."
+    },
+    {
+      "match": "if (modelPrefab != null && modelInstance == null)",
+      "span": 2,
+      "text": "Ensures a model is instantiated on first load even if RefreshModel was never manually clicked in the Editor."
+    },
+    {
+      "match": "public bool CanCollect(Transform player)",
+      "span": 4,
+      "text": "Public range check other scripts (CollectiblesManager) use to decide if this item is currently reachable."
+    },
+    {
+      "match": "public void Collect()",
+      "span": 8,
+      "text": "The actual pickup: guards against double-collection, then routes through the manager (which counts it and plays the shrink-away) or just deactivates itself if there's no manager."
+    },
+    {
+      "match": "if (modelInstance != null)",
+      "span": 7,
+      "text": "Destroys any previously-spawned model before creating a new one — Destroy in Play mode, DestroyImmediate in the Editor (Destroy is deferred and not allowed outside Play mode)."
+    },
+    {
+      "match": "MeshRenderer rootRenderer = GetComponent<MeshRenderer>();",
+      "span": 3,
+      "text": "Legacy items authored as plain primitives (a MeshRenderer directly on this object) keep showing until a real model prefab replaces them."
+    },
+    {
+      "match": "if (modelPrefab == null)",
+      "span": 2,
+      "text": "No model assigned — nothing further to instantiate."
+    },
+    {
+      "match": "if (!Application.isPlaying)",
+      "span": 6,
+      "text": "In the Editor outside Play mode, uses PrefabUtility.InstantiatePrefab so the instance stays linked to its source prefab (so prefab overrides/updates keep working); Instantiate is used everywhere else."
+    },
+    {
+      "match": "modelInstance.transform.localScale = Vector3.one;",
+      "span": 3,
+      "text": "Resets the spawned model's local transform to identity — the prefab's own pivot should already be correct."
+    },
+    {
+      "match": "visualColliders[i].enabled = false;",
+      "span": 3,
+      "text": "Disables every collider on the visual model so only the collectible root's own collider drives interaction — an imported model with its own colliders could otherwise block the player."
+    }
+  ]
+}
