@@ -1,0 +1,121 @@
+{
+  "id": "quest-hud-controller",
+  "title": "QuestHUDController.cs",
+  "path": "Assets/Scripts/Quests/QuestHUDController.cs",
+  "summary": "The UI Toolkit Quest Journal drawer: lists every active/completed Quest with live per-criterion progress, the episode countdown, and the Episode Complete / Game Over modal shown when a Quest resolves.",
+  "notes": [
+    {
+      "match": "public static QuestHUDController Instance { get; private set; }",
+      "text": "Singleton — Quest, PlayerControls, CollectiblesManager and NPCInteractionManager all reach this via QuestHUDController.Instance."
+    },
+    {
+      "match": "[SerializeField] float refreshInterval = 0.15f;",
+      "text": "How often the quest list/timer repaint themselves — not every frame, to avoid rebuilding UI elements 60 times a second."
+    },
+    {
+      "match": "float refreshTimer;",
+      "text": "Public so other scripts (CollectiblesManager, NPCInteractionManager) can check 'is the journal open' to suppress their own prompts."
+    },
+    {
+      "match": "UIDocument document;",
+      "span": 13,
+      "text": "Cached references to every named element in the Quest HUD's UXML: the drawer itself, its 'closed' shortcut icon, the scrollable quest list, summary/timer labels, and the entire Episode Complete/Game Over modal's pieces."
+    },
+    {
+      "match": "void Awake()",
+      "span": 9,
+      "text": "Standard singleton Awake, plus resolving the shared PlayerInputBindings for the OpenQuest action."
+    },
+    {
+      "match": "void Start()",
+      "span": 6,
+      "text": "On Start, ensures the UI is wired, forces the drawer closed (regardless of any serialized/edited state), and does an initial paint of the quest list."
+    },
+    {
+      "match": "Close();",
+      "span": 6,
+      "text": "Cleanup: unhooks the close button's handler, clears the questOpen flag, and releases the singleton so a fresh instance in a reloaded scene doesn't collide with a stale one."
+    },
+    {
+      "match": "bool togglePressed = inputBindings != null && inputBindings.OpenQuest != null",
+      "span": 3,
+      "text": "Prefers the actual OpenQuest input action; falls back to a raw Q key check only if that action wasn't resolved for some reason."
+    },
+    {
+      "match": ": Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame;",
+      "span": 2,
+      "text": "Won't toggle open while paused or mid-conversation — same 'only one full-screen system at a time' discipline as everywhere else."
+    },
+    {
+      "match": "Toggle();",
+      "span": 6,
+      "text": "The periodic repaint: only runs once every refreshInterval seconds using a countdown timer, not every single frame."
+    },
+    {
+      "match": "void InitializeUI()",
+      "span": 23,
+      "text": "Same 'query every named UI Toolkit element once by name' pattern as BagUIController/PauseMenu, just against the Quest HUD's own UXML."
+    },
+    {
+      "match": "public void Toggle()",
+      "span": 4,
+      "text": "Public toggle, called by the HUD journal button and the Q key."
+    },
+    {
+      "match": "public void Open()",
+      "span": 13,
+      "text": "Opening closes Tasks first (same mutual-exclusion rule), flips the flags, and immediately refreshes so the list isn't stale from before it was opened."
+    },
+    {
+      "match": "drawer.RemoveFromClassList(\"is-hidden\");",
+      "span": 7,
+      "text": "Closing is the mirror image — note IsOpen/questOpen get cleared even if the drawer element itself is missing, so state never gets stuck out of sync with the visuals."
+    },
+    {
+      "match": "void RefreshQuestList()",
+      "span": 9,
+      "text": "Recomputes which quests are 'visible' (active or completed — not ones that are simply inactive/not-yet-started) and how many of those are done, for the summary line."
+    },
+    {
+      "match": "int completedCount = 0;",
+      "span": 8,
+      "text": "Finds the first active quest that actually has a timer and shows its countdown; adds a warning CSS class in the last 10 seconds for a visual urgency cue."
+    },
+    {
+      "match": "Quest timedQuest = null;",
+      "span": 13,
+      "text": "Clears and rebuilds the entire quest list every refresh — simplest correct approach given the refresh interval is already throttled to a few times a second, well within UI Toolkit's rebuild budget."
+    },
+    {
+      "match": "VisualElement CreateQuestBlock(Quest quest)",
+      "span": 3,
+      "text": "Builds the card for one Quest (title, status, description and a row per requirement) and one progress row (BAG / STRESS / PERSON) as a VisualElement tree in code. It is mechanical, so it is not walked through here."
+    },
+    {
+      "match": "questList.Add(CreateQuestBlock(visibleQuests[i]));",
+      "span": 20,
+      "text": "Two thin wrappers around a shared modal-builder: one for success, one for the timeout failure case, each supplying their own copy and primary/secondary button targets."
+    },
+    {
+      "match": "ShowEpisodeModal(",
+      "nth": 2,
+      "span": 25,
+      "text": "Fills in the modal's text and re-wires its two buttons' click handlers (carefully removing old handlers first so repeated calls don't stack), then shows it, forces the game into a paused-and-unlocked-cursor state, and freezes time."
+    },
+    {
+      "match": "void RetryEpisode()",
+      "span": 3,
+      "text": "Retry reloads the current scene through the episode loading screen (with the saved episode number), a clean way to fully reset all quest, collectible and NPC state."
+    },
+    {
+      "match": "UnityEngine.Cursor.lockState = CursorLockMode.None;",
+      "span": 9,
+      "text": "Next Chapter persists the unlock + a 'start page' pref MainMenuController reads to jump straight to chapter select, then returns to the Main Menu scene."
+    },
+    {
+      "match": "void GoToNextChapter()",
+      "span": 5,
+      "text": "Plain 'give up and return to menu' — resets the start page back to the very first Main Menu screen."
+    }
+  ]
+}

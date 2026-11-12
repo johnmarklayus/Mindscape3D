@@ -42,9 +42,12 @@
 
         <!-- A short 5-4-3-2-1 grounding break -->
         <ui:VisualElement name="grounding-screen" class="screen centered hidden">
-            <ui:VisualElement class="dialog panel-ink">
+            <ui:VisualElement class="dialog panel-ink ground-dialog">
                 <ui:Label name="ground-count" text="5-4-3-2-1 GROUNDING  /  5  ·  SEE  /  STEP 1 OF 5" class="eyebrow"/>
-                <ui:Label name="ground-text" text="Look around and find five things you can see." class="serif dialog-title"/>
+                <ui:Label name="ground-text" text="Look around the room. Tap five things you can see." class="serif dialog-title ground-title"/>
+                <!-- Picture tiles (desk, paper, clock, window...) are added by FamilyExamEpisode; tap the ones that fit the sense. -->
+                <ui:VisualElement name="ground-items" class="ground-items"/>
+                <ui:Label name="ground-status" text="0 of 5" class="ground-status"/>
                 <ui:Button name="ground-button" text="I see five things  [Space]" class="btn dialog-button"/>
                 <ui:Label text="The examination clock pauses while you take this moment." class="dialog-note"/>
             </ui:VisualElement>

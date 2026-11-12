@@ -1,0 +1,91 @@
+{
+  "id": "breathing-minigame",
+  "title": "BreathingMinigame.cs",
+  "path": "Assets/Scripts/Minigames/BreathingMinigame.cs",
+  "summary": "The guided breathing exercise: a circle opens on the in-breath, rests, and settles on the out-breath. Its screen is a UI Toolkit file (Breathing.uxml / .uss, editable in UI Builder) in the game's theme, and it plugs into the Quest as a QuestMinigame.",
+  "notes": [
+    {
+      "match": "public class BreathingMinigame : QuestMinigame",
+      "text": "A QuestMinigame, so the Quest's Required Minigames list accepts it and can open it from a conversation, a timer or a stress level."
+    },
+    {
+      "match": "[Min(1f)] public float durationSeconds = 15f;",
+      "text": "Total exercise length: 15 seconds."
+    },
+    {
+      "match": "[Min(0.5f)] public float inhaleSeconds = 5f;",
+      "text": "One cycle is inhale (5) + hold (3) + exhale (7) = 15 seconds, repeated until the time runs out. One full breath fills the exercise exactly, so it never ends in the middle of an in-breath.",
+      "span": 3
+    },
+    {
+      "match": "[Min(0f)] public float closingSeconds = 2.5f;",
+      "text": "After the last breath a closing line stays on screen this long before the exercise ends."
+    },
+    {
+      "match": "public BreathingTexts texts = new BreathingTexts();",
+      "text": "Every word on screen: the title, the three phase names and their hints, and the closing line. All editable in the Inspector."
+    },
+    {
+      "match": "public BreathingLook look = new BreathingLook();",
+      "text": "The colours and the smallest and largest circle size."
+    },
+    {
+      "match": "VisualElement root, circle, ring, core, progressFill;",
+      "text": "The screen's elements, found by name in Breathing.uxml, a UI Toolkit file you can edit in UI Builder. This script only fills in the text and animates the circle and the progress bar, so keep the names in the file.",
+      "span": 3
+    },
+    {
+      "match": "public override string QuestDisplayName => \"Breathing Exercise\";",
+      "text": "The name shown in the Quest Journal."
+    },
+    {
+      "match": "BuildUI();",
+      "text": "Builds the screen at startup from the shared Breathing.uxml (loaded through EpisodeUI), then hides it until Open."
+    },
+    {
+      "match": "closingLeft -= Time.unscaledDeltaTime;",
+      "text": "All timing uses unscaled time, so the exercise still runs if the game is paused elsewhere."
+    },
+    {
+      "match": "if (remaining <= 0f) BeginClosing();",
+      "text": "Time's up: show the closing line instead of cutting off abruptly."
+    },
+    {
+      "match": "public override void Open(Quest quest)",
+      "text": "Called by the Quest. Remembers it so it can report completion."
+    },
+    {
+      "match": "if (playerControls != null) playerControls.minigameOpen = true;",
+      "text": "Freezes movement and hides NPC prompts; the Quest also pauses its episode timer while this is true."
+    },
+    {
+      "match": "activeQuest?.NotifyMinigameClosed(this);",
+      "text": "Leaving early doesn't lose the requirement: talking to the same NPC again opens it again."
+    },
+    {
+      "match": "activeQuest?.NotifyMinigameCompleted(this);",
+      "text": "Only a finished exercise counts toward the Quest."
+    },
+    {
+      "match": "blend = Mathf.SmoothStep(0f, 1f, k); phaseLeft = inhaleSeconds - t;",
+      "text": "SmoothStep eases the circle in and out, so it opens and settles gently rather than at a constant speed."
+    },
+    {
+      "match": "scale = Mathf.Lerp(look.smallestScale, look.largestScale, blend);",
+      "text": "One number (0 to 1) drives both the circle's size and its colour."
+    },
+    {
+      "match": "if (countLabel != null) countLabel.text = Mathf.Max(1, Mathf.CeilToInt(phaseLeft)).ToString();",
+      "text": "The big number inside the circle counts the seconds left in the current phase."
+    },
+    {
+      "match": "void BuildUI()",
+      "text": "Spawns the UI Toolkit document above the story panels and the pause menu (sortingOrder), looks every element up by name, wires the Close button, and applies the colours from the Look settings. If Breathing.uxml is missing it logs a warning and the exercise has no screen.",
+      "span": 24
+    },
+    {
+      "match": "closeButton.focusable = false; // Space and Enter belong to the story, not to a focused button",
+      "text": "The button never takes keyboard focus, so Space and Enter keep advancing the story instead of pressing Close."
+    }
+  ]
+}

@@ -53,7 +53,7 @@ public class MainMenuNewController : MonoBehaviour
         RefreshLocks();
         ShowPage("home");
         // Ask to log in (or play offline) once; a stored login or offline choice skips straight to the home page.
-        if (Application.isPlaying) { if (NeedsLogin) ShowPage("login"); else if (MindscapeCloud.IsSignedIn && !MindscapeCloud.IsLoaded) RefreshCloud(); }
+        if (Application.isPlaying) { if (NeedsLogin) ShowLogin(); else if (MindscapeCloud.IsSignedIn && !MindscapeCloud.IsLoaded) RefreshCloud(); }
         if (Application.isPlaying) { GraphicsPrefs.Apply(); Time.timeScale = 1; UnityEngine.Cursor.lockState = CursorLockMode.None; UnityEngine.Cursor.visible = true; }
     }
 
@@ -296,6 +296,17 @@ public class MainMenuNewController : MonoBehaviour
     }
     string Field(string name) => root.Q<TextField>(name)?.value ?? "";
     void ClearFields(params string[] names) { foreach (var name in names) { var field = root.Q<TextField>(name); if (field != null) field.value = ""; } }
+
+    // The login page. After a session ran out by itself (MindscapeCloud.HasAccount without IsSignedIn) it says so and
+    // fills in the username, so logging back in is one password away.
+    void ShowLogin()
+    {
+        ShowPage("login");
+        if (!MindscapeCloud.HasAccount || MindscapeCloud.IsSignedIn) return;
+        var field = root.Q<TextField>("login-username");
+        if (field != null && field.value.Length == 0) field.value = MindscapeCloud.Username;
+        SetStatus("login-status", "Your session ended. Please log in again to keep saving to your account.");
+    }
 
     async void SignIn()
     {
@@ -657,6 +668,8 @@ public class MainMenuNewController : MonoBehaviour
         var name = root.Q<Label>("account-name"); if (name != null) name.text = AccountLabel;
         var action = root.Q<Button>("sign-out"); if (action != null) action.text = AccountAction;
         On(action, () => MindscapeCloud.SignOut());
+        // The menu hides while the credits play, so a tap on them never lands on a menu button underneath.
+        On("about-credits", () => { root.style.visibility = Visibility.Hidden; CreditsRoll.Play(() => root.style.visibility = Visibility.Visible); });
         foreach (var target in new[] { "chapters", "continue", "journal", "options", "guide", "resources", "about", "quit" })
         {
             string page = target;
@@ -945,6 +958,13 @@ public class MainMenuNewController : MonoBehaviour
             var levels = new List<string>(QualitySettings.names);
             quality.choices = levels; quality.SetValueWithoutNotify(levels[Mathf.Clamp(QualitySettings.GetQualityLevel(), 0, levels.Count - 1)]);
             quality.RegisterValueChangedCallback(evt => GraphicsPrefs.Set(GraphicsPrefs.QualityKey, levels.IndexOf(evt.newValue)));
+        }
+        var character = root.Q<DropdownField>("character");
+        if (character != null)
+        {
+            var names = new List<string>(PlayerAppearance.Names);
+            character.choices = names; character.SetValueWithoutNotify(names[PlayerAppearance.IsGirl ? 1 : 0]);
+            character.RegisterValueChangedCallback(evt => PlayerAppearance.Choose(names.IndexOf(evt.newValue) == 1));
         }
         BindChoice("texture-quality", GraphicsPrefs.TextureNames, GraphicsPrefs.Texture, GraphicsPrefs.TextureKey);
         BindChoice("frame-rate", GraphicsPrefs.FrameRateNames, GraphicsPrefs.FrameRate, GraphicsPrefs.FrameRateKey);

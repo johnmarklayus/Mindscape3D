@@ -23,7 +23,7 @@
                         <ui:VisualElement class="auth-divider-line"/>
                     </ui:VisualElement>
                     <ui:Button name="login-google" class="google-button" tooltip="Sign in or create an account with Google">
-                        <ui:Label text="G" picking-mode="Ignore" class="google-mark"/>
+                        <GoogleLogo class="google-mark"/>
                         <ui:Label text="Continue with Google" picking-mode="Ignore" class="google-text"/>
                     </ui:Button>
                     <ui:Label name="login-status" class="journal-status login-status"/>
@@ -108,7 +108,7 @@
                         <ui:VisualElement class="rail-tile">
                             <MenuLineArt kind="phone" class="rail-icon"/>
                         </ui:VisualElement>
-                        <ui:Label text="Resources" picking-mode="Ignore" class="rail-label"/>
+                        <ui:Label text="Hotline" picking-mode="Ignore" class="rail-label"/>
                     </ui:Button>
                     <ui:Button name="open-about" class="rail-button">
                         <ui:VisualElement class="rail-tile">
@@ -418,6 +418,7 @@
                         <ui:ScrollView mode="Vertical" class="paper-scroll">
                             <ui:VisualElement name="page-options-panel-0">
                                 <ui:Label text="Make yourself comfortable" class="paper-title"/>
+                                <ui:DropdownField name="character" label="Character" tooltip="Play as the boy or the girl. Takes effect from the next episode you start."/>
                                 <ui:VisualElement class="setting-row">
                                     <ui:Label text="Master volume" class="setting-label"/>
                                     <ui:Slider name="Mindscape.Master" low-value="0" high-value="1"/>
@@ -454,7 +455,7 @@
                                 <ui:DropdownField name="frame-rate" label="Frame rate limit"/>
                                 <ui:DropdownField name="display-mode" label="Display (F11)" tooltip="Windowed or fullscreen. F11 switches at any time."/>
                                 <ui:VisualElement class="setting-row">
-                                    <ui:Label text="Prevent screen tearing (V-Sync)" class="setting-label"/>
+                                    <ui:Label text="V-Sync" tooltip="Prevents screen tearing" class="setting-label"/>
                                     <ui:Toggle name="Mindscape.VSync"/>
                                 </ui:VisualElement>
                                 <ui:Label text="Lower texture quality or a 30 FPS limit helps slower devices and saves battery. With V-Sync on, the game matches your screen's refresh rate and the frame rate limit is not used." class="small"/>
@@ -602,6 +603,10 @@
                                         <ui:Label text="Tasks" class="small"/>
                                     </ui:VisualElement>
                                     <ui:VisualElement class="key-tile">
+                                        <ui:Label text="R" class="keycap"/>
+                                        <ui:Label text="Unstuck" class="small"/>
+                                    </ui:VisualElement>
+                                    <ui:VisualElement class="key-tile">
                                         <ui:Label text="Esc" class="keycap"/>
                                         <ui:Label text="Pause menu" class="small"/>
                                     </ui:VisualElement>
@@ -619,7 +624,7 @@
                             </ui:VisualElement>
                             <ui:VisualElement name="page-guide-panel-3" class="hidden">
                                 <ui:Label text="Take it at your own pace" class="paper-title"/>
-                                <ui:Label text="There is no need to rush.&#10;&#10;Listen to the people you meet. Notice how each situation makes you feel.&#10;&#10;You can pause whenever you need a break. Your next small step will still be here.&#10;&#10;If a story feels difficult, talk to someone you trust. The Resources page can help you find support." class="body"/>
+                                <ui:Label text="There is no need to rush.&#10;&#10;Listen to the people you meet. Notice how each situation makes you feel.&#10;&#10;You can pause whenever you need a break. Your next small step will still be here.&#10;&#10;If a story feels difficult, talk to someone you trust. The Hotline page can help you find support." class="body"/>
                             </ui:VisualElement>
                         </ui:ScrollView>
                     </ui:VisualElement>
@@ -629,7 +634,7 @@
                 <ui:VisualElement class="header">
                     <ui:Button name="back-resources" text="‹ Back" class="back"/>
                     <MenuLineArt kind="sprig" class="flourish"/>
-                    <ui:Label text="RESOURCES" class="page-title"/>
+                    <ui:Label text="HOTLINE" class="page-title"/>
                     <MenuLineArt kind="sprig" class="flourish"/>
                 </ui:VisualElement>
                 <ui:VisualElement class="book">
@@ -716,6 +721,9 @@
                         <ui:Label text="A little space to grow" class="paper-title"/>
                         <ui:Label text="MindScape 3D is a student capstone project exploring mental health awareness and emotional well-being through interactive storytelling.&#10;&#10;At its heart is a simple belief: understanding ourselves is a first step toward growth.&#10;&#10;We hope this journey helps you find a moment of reflection, a little courage, and a reminder that you matter." class="body"/>
                         <ui:Label text="Thank you for being part of the story." class="small"/>
+                        <ui:VisualElement class="actions">
+                            <ui:Button name="about-credits" text="Credits"/>
+                        </ui:VisualElement>
                         <MenuLineArt kind="leaf" dark="true" class="leaf-decoration"/>
                     </ui:VisualElement>
                 </ui:VisualElement>

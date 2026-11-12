@@ -57,3 +57,15 @@
 .dialog-row { flex-direction: row; }
 .dialog-half { flex-grow: 1; flex-basis: 0; height: 48px; margin-right: 14px; }
 .dialog-half.last { margin-right: 0; }
+
+/* The grounding break's picture tiles: tap the things you can see, feel, hear, smell and taste. */
+.ground-dialog { width: 70%; max-width: 1000px; padding: 22px 28px 18px 28px; }
+.ground-title { font-size: 23px; margin-bottom: 12px; }
+.ground-items { flex-direction: row; flex-wrap: wrap; justify-content: center; margin-bottom: 8px; }
+.ground-item { width: 132px; height: 116px; margin: 5px; padding: 6px 4px 6px 4px; border-radius: 10px; border-width: 3px; border-color: rgba(0,0,0,0); background-color: #E2D6BD; align-items: center; justify-content: space-between; flex-direction: column; }
+.ground-item:hover { background-color: #F0E6CF; }
+.ground-item.found { background-color: #A0BA96; border-color: #DBB36F; }
+.ground-item.wrong { border-color: #C0715F; background-color: #E8C9BE; }
+.ground-icon { width: 66px; height: 66px; flex-shrink: 0; }
+.ground-label { font-size: 14px; color: #2B2A26; -unity-text-align: middle-center; white-space: normal; margin: 0; padding: 0; }
+.ground-status { font-size: 16px; color: #DBB36F; -unity-text-align: middle-center; margin-bottom: 10px; }

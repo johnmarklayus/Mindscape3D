@@ -1,0 +1,69 @@
+{
+  "id": "npc",
+  "title": "NPC.cs",
+  "path": "Assets/Scripts/NPC/NPC.cs",
+  "summary": "Per-NPC data: identity, interaction radius, conversation-camera framing, and the dialogue tree (nodes + branching player choices). No behavior of its own — NPCInteractionManager drives it.",
+  "notes": [
+    {
+      "match": "[Tooltip(\"Prefab or imported model displayed for this NPC.\")]",
+      "text": "The NPC's identity — matched (case-insensitively) against Quest.requiredNPCNames."
+    },
+    {
+      "match": "[Tooltip(\"Seconds used to turn toward the player and return to the resting direction.\")]",
+      "text": "How close the player must be for this NPC to become 'nearby' and show the talk prompt."
+    },
+    {
+      "match": "[Header(\"Conversation Camera\")]",
+      "text": "How long the smooth turn-to-face-player animation takes when a conversation starts (and turning back afterward)."
+    },
+    {
+      "match": "public List<NPCDialogueNode> dialogueNodes = new List<NPCDialogueNode>",
+      "text": "If false, every conversation is a single line with just a 'Continue/Goodbye' button; if true, choices can branch across multiple dialogueNodes."
+    },
+    {
+      "match": "public Vector3 FacePosition",
+      "text": "Tracks the spawned visual model instance, same pattern as CollectibleItem."
+    },
+    {
+      "match": "public class NPCDialogueChoice",
+      "span": 9,
+      "text": "One player-facing dialogue option: its button text, the stress it applies if picked, which node it jumps to next (or ends the conversation), and an explicit 'end' flag."
+    },
+    {
+      "match": "[Serializable]",
+      "nth": 2,
+      "span": 6,
+      "text": "One beat of NPC speech plus the list of choices the player can respond with. A TextArea gives it a multi-line field in the Inspector."
+    },
+    {
+      "match": "public Vector3 modelOffset;",
+      "span": 2,
+      "text": "Same 'swap prefab, click Refresh' pattern as CollectibleItem for the NPC's visual model."
+    },
+    {
+      "match": "public float faceHeight = 1.65f;",
+      "span": 4,
+      "text": "Tuning for the close-up conversation camera: an optional explicit face transform, otherwise a height offset from the NPC's feet, plus how far back/up the camera sits."
+    },
+    {
+      "match": "public List<NPCDialogueNode> dialogueNodes = new List<NPCDialogueNode>",
+      "span": 4,
+      "text": "Always starts with at least one empty dialogue node so the Inspector isn't blank by default."
+    },
+    {
+      "match": ": transform.position + Vector3.up * faceHeight;",
+      "span": 3,
+      "text": "Where the conversation camera aims: an explicit Transform if set, otherwise computed from the NPC's position + faceHeight."
+    },
+    {
+      "match": "return player != null && Vector3.Distance(transform.position, player.position) <= interactionRadius;",
+      "span": 4,
+      "text": "Simple range check — used by NPCInteractionManager to decide which NPC (if any) is currently reachable."
+    },
+    {
+      "match": "if (modelInstance != null)",
+      "span": 25,
+      "text": "Identical model-swap logic to CollectibleItem.RefreshModel: destroy the old instance, bail if no prefab is assigned, instantiate (via PrefabUtility in the Editor to preserve the prefab link), reset its local transform, and disable its colliders so only the NPC's own CapsuleCollider drives interaction."
+    }
+  ]
+}

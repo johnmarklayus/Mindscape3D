@@ -91,8 +91,8 @@ Button:disabled { opacity: 0.5; }
 .row { flex-direction: row; align-items: center; }
 .spread { justify-content: space-between; }
 .grow { flex-grow: 1; }
-.setting-row { height: 56px; flex-direction: row; align-items: center; border-bottom-width: 1px; border-bottom-color: rgba(102,80,48,0.13); }
-.setting-label { width: 190px; max-width: 45%; font-size: 16px; }
+.setting-row { min-height: 56px; flex-shrink: 0; flex-direction: row; align-items: center; border-bottom-width: 1px; border-bottom-color: rgba(102,80,48,0.13); }
+.setting-label { width: 190px; max-width: 45%; flex-shrink: 0; font-size: 16px; white-space: normal; padding: 4px 0; }
 .now-playing { flex-grow: 1; flex-shrink: 1; font-size: 16px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; -unity-font-style: italic; }
 .music-button { min-width: 84px; margin-left: 8px; }
 .setting-value { width: 52px; -unity-text-align: middle-right; font-size: 14px; }
@@ -180,7 +180,7 @@ Toggle { min-height: 40px; }
 .compact-height .page-title { font-size: 22px; }
 .compact-height .flourish { height: 16px; width: 50px; margin: 0 10px; }
 .compact-height .paper { padding: 12px 18px; }
-.compact-height .setting-row { height: 46px; }
+.compact-height .setting-row { min-height: 46px; }
 .compact-height .episode-row { height: 60px; }
 
 /* Responsive adjustments for portrait and narrow screens (< 960px) */
@@ -212,7 +212,7 @@ Toggle { min-height: 40px; }
 .account Button { min-height: 32px; padding: 2px 14px; font-size: 15px; }
 .login-paper { width: 560px; max-width: 94%; }
 .auth-card { height: 405px; max-height: 100%; min-height: 0; flex-grow: 0; flex-shrink: 1; align-items: stretch; padding: 18px 24px; border-width: 2px; border-color: #bda477; background-color: var(--paper-light); }
-.auth-login-card { height: 470px; }
+.auth-login-card { height: 505px; }
 .auth-register-card { height: 560px; }
 .auth-scroll { width: 100%; flex-grow: 1; min-height: 0; }
 .auth-scroll > .unity-scroll-view__content-viewport > .unity-scroll-view__content-container { align-items: stretch; padding-right: 6px; }
@@ -298,7 +298,7 @@ Toggle { min-height: 40px; }
 .mobile .tab { min-height: 48px; }
 .mobile .sidebar { width: 190px; }
 .mobile .episode-row { height: 64px; }
-.mobile .setting-row { height: 52px; }
+.mobile .setting-row { min-height: 52px; }
 .mobile .journal-input { min-height: 90px; }
 .mobile .save-slot { height: auto; min-height: 120px; }
 .mobile .save-slot .thumbnail { width: 120px; height: 75px; }
@@ -337,7 +337,7 @@ Toggle { min-height: 40px; }
 .google-button:hover { background-color: #f3eee4; border-color: #79603d; }
 .google-button:active { background-color: #e6dfd1; }
 .google-button:focus { border-color: #79603d; }
-.google-mark { width: 26px; height: 26px; margin-right: 10px; font-size: 22px; -unity-font-style: bold; -unity-text-align: middle-center; color: #4285f4; }
+.google-mark { width: 22px; height: 22px; margin-right: 12px; flex-shrink: 0; }
 .google-text { font-size: 16px; color: #3c3a37; }
 
 /* Sign-up: a message under a field (username taken, email not Gmail/Yahoo, ...). Empty ones take no space. */

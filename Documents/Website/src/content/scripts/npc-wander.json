@@ -1,0 +1,68 @@
+{
+  "id": "npc-wander",
+  "title": "NPCWander.cs",
+  "path": "Assets/Scripts/NPC/NPCWander.cs",
+  "summary": "Walks an NPC between waypoints around the house. It stands still while the player is close enough to talk and during any conversation.",
+  "notes": [
+    {
+      "match": "public enum Pattern { Loop, PingPong, Random }",
+      "text": "Loop: 1,2,3,1,2,3. PingPong: 1,2,3,2,1. Random: any point next, so every pair of points needs a clear straight line."
+    },
+    {
+      "match": "public List<Transform> waypoints = new List<Transform>();",
+      "text": "Plain scene objects (under 'NPC Waypoints'). Move, add or delete them in the Hierarchy — no code changes."
+    },
+    {
+      "match": "[Min(0.1f)] public float walkSpeed = 1.1f;",
+      "text": "Metres per second."
+    },
+    {
+      "match": "[Range(1f, 90f)] public float moveAngle = 35f;",
+      "text": "The NPC turns on the spot first and only starts walking once it faces within this many degrees of the target, so it never slides sideways."
+    },
+    {
+      "match": "public Vector2 pauseSeconds = new Vector2(2f, 6f);",
+      "text": "A random rest between the two numbers at each waypoint."
+    },
+    {
+      "match": "public bool pauseWhenPlayerNear = true;",
+      "text": "Stands still while the player is inside the NPC's interaction radius, so the NPC doesn't walk away mid-approach."
+    },
+    {
+      "match": "if (!TryGetComponent<Rigidbody>(out var body)) body = gameObject.AddComponent<Rigidbody>();",
+      "text": "A kinematic Rigidbody lets the NPC move every frame without Unity rebuilding the static physics world."
+    },
+    {
+      "match": "body.isKinematic = true; body.useGravity = false;",
+      "text": "Kinematic: moved by script only. The NPC's own collider still blocks the player."
+    },
+    {
+      "match": "target = ClosestWaypoint();",
+      "text": "Starts at whichever waypoint is nearest where the NPC was placed."
+    },
+    {
+      "match": "if (NPCInteractionManager.DialogueActive) { SetWalking(false); return; } // the conversation system owns rotation while talking",
+      "text": "While any conversation is open, this script does nothing so it doesn't fight the manager turning the NPC toward the player."
+    },
+    {
+      "match": "if (pauseWhenPlayerNear && npc != null && npc.IsInRange(player))",
+      "text": "Reuses the NPC's own interaction radius, so 'close enough to press F' and 'stands still' are always the same distance."
+    },
+    {
+      "match": "float angle = TurnToward(flat);",
+      "text": "Always turn toward the target; the returned angle decides whether to move yet."
+    },
+    {
+      "match": "transform.position = Vector3.MoveTowards(transform.position, goal.position, walkSpeed * Time.deltaTime);",
+      "text": "Moves in 3D toward the waypoint, so a rug's few centimetres of height are followed smoothly."
+    },
+    {
+      "match": "case Pattern.PingPong:",
+      "text": "Reverses direction at either end of the list."
+    },
+    {
+      "match": "void OnDrawGizmosSelected()",
+      "text": "Draws the route in the Scene view when the NPC is selected: spheres at the waypoints and lines between them."
+    }
+  ]
+}

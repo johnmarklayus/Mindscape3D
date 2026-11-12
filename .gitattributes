@@ -1,0 +1,2 @@
+# Shell scripts keep Unix line endings on Windows too (Git Bash cannot run them with CRLF).
+*.sh text eol=lf

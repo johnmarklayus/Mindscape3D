@@ -3,7 +3,102 @@ guid: bf9ea1e3e29f3499b94882a8a7636005
 ModelImporter:
   serializedVersion: 24501
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bath Mat
+    second: {fileID: 2100000, guid: 1b1290fb6e2714a1e84806bffa610766, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Bathroom Tile
+    second: {fileID: 2100000, guid: 0931a05dbf9a34987abcbecdb229aec8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Canvas school bag
+    second: {fileID: 2100000, guid: 2a5b4dd74abee4bdfbec3ebf9f429a43, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ceramic
+    second: {fileID: 2100000, guid: 1b2c25199c3b044e48922a7c7910102d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Chrome
+    second: {fileID: 2100000, guid: adaa694a15ef144e4aa45eb73cc548b6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Dark Wood
+    second: {fileID: 2100000, guid: 7146d1543bffc4ea1b02a0d1db0da16c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ivory
+    second: {fileID: 2100000, guid: bdbf99d3c9f484792993ad975d3d902d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Light Wood
+    second: {fileID: 2100000, guid: 4dd119a7e87ea4d158cee16ae8fc25c8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Mirror
+    second: {fileID: 2100000, guid: 23dd03259d805494a8e5f75dbecd6604, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Notebook teal
+    second: {fileID: 2100000, guid: 8e52bc98ceaca45bdae9bab25281e224, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Paper
+    second: {fileID: 2100000, guid: f5835fa5f76de4c459e1396e937215ac, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Sage
+    second: {fileID: 2100000, guid: 487dfd89dee4044b09eff7d0334eb236, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: School teal
+    second: {fileID: 2100000, guid: 9f74287d0ba4f4de094f5d858833c1d9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Shower Glass
+    second: {fileID: 2100000, guid: 63b7454cea4624d22adf9e64c04006e8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Soft Coral
+    second: {fileID: 2100000, guid: 76a88c3eb9e6c4fe5b760b57d8ba9998, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Soft brass
+    second: {fileID: 2100000, guid: 145766a3222d846e696d3e2f7cf2e753, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Tile Grout
+    second: {fileID: 2100000, guid: 714a4f721303142218dac6c6fe1db1e0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Towel
+    second: {fileID: 2100000, guid: 586b3c4c0f08546dea2b96f67d755c4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Warm walnut
+    second: {fileID: 2100000, guid: 0bc9a535a57ef40b18a4aaf5136eb4b9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

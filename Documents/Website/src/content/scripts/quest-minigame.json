@@ -1,0 +1,32 @@
+{
+  "id": "quest-minigame",
+  "title": "QuestMinigame.cs",
+  "path": "Assets/Scripts/Minigames/QuestMinigame.cs",
+  "summary": "The small base class every Quest-driven minigame derives from, so a Quest can open and wait on the breathing exercise, the Worry Courtroom, or any new minigame the same way.",
+  "notes": [
+    {
+      "match": "public abstract class QuestMinigame : MonoBehaviour",
+      "text": "Derive from this and the Quest's 'Required Minigames' list will accept your component in its Minigame slot."
+    },
+    {
+      "match": "public abstract bool IsOpen { get; }",
+      "text": "True while the minigame is on screen. QuestHUDController uses it to close anything still open when an episode ends."
+    },
+    {
+      "match": "public abstract void Open(Quest quest);",
+      "text": "Called by the Quest when its trigger fires (on start, a timer, a stress level, or finishing a conversation). Keep the quest so you can report back."
+    },
+    {
+      "match": "public abstract void Close();",
+      "text": "Close the screen. If the player closed it before finishing, also call Quest.NotifyMinigameClosed(this) so the same trigger can open it again."
+    },
+    {
+      "match": "[SerializeField] string questDisplayName = \"\";",
+      "text": "Optional label for the Quest Journal. Leave blank to use the GameObject's name."
+    },
+    {
+      "match": "public virtual string QuestDisplayName => string.IsNullOrWhiteSpace(questDisplayName) ? name : questDisplayName;",
+      "text": "The Journal shows this next to DONE / PENDING. The built-in minigames override it with a fixed, friendly name."
+    }
+  ]
+}

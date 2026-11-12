@@ -7,9 +7,11 @@ using UnityEngine.InputSystem;
 // cursor locking, and the crosshair.
 // Input comes from PlayerInputBindings; whether an tasks/pause panel is
 // blocking control comes from PlayerControls.IsOverlayOpen() on the same GameObject.
+// The camera half of this component (orbit, zoom, first person, wall collision) is in
+// Assets/Scripts/Camera/PlayerMovement.Camera.cs; its Inspector settings are the "Camera" and "Zoom" fields below.
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInputBindings))]
-public class PlayerMovement : MonoBehaviour
+public partial class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
@@ -19,6 +21,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
     public float runSpeed = 8f;
+    [Tooltip("Off: Shift does nothing, the player only walks (a story can switch this, e.g. Chapter 3 Episode 8).")]
+    public bool canRun = true;
 
     [Header("Camera")]
     public Transform cameraTransform;
@@ -49,6 +53,8 @@ public class PlayerMovement : MonoBehaviour
     public float cameraCollisionRadius = 0.25f;
     public float cameraCollisionPadding = 0.15f;
     public LayerMask cameraCollisionMask = ~0;
+    [Tooltip("Turning the camera stops when a wall would pull it closer than this to the player (it bumps into the wall instead of swinging through it into the character).")]
+    public float cameraWallStopDistance = 1.5f;
 
     [Header("Zoom")]
     public float zoomSpeed = 5f;
@@ -128,24 +134,6 @@ public class PlayerMovement : MonoBehaviour
         _controller.center = new Vector3(_controller.center.x, _controller.height * .5f, _controller.center.z);
     }
 
-    // The orbit camera aims at cameraTargetHeight, the shoulders, and the shoulder offset keeps the head out of the way. First person
-    // wants the eyes, so it is measured from the model's own height (a little below the top of the head).
-    float MeasureEyeHeight()
-    {
-        if (firstPersonEyeHeight > 0f) return firstPersonEyeHeight;
-        var mesh = animator != null ? animator.GetComponentInChildren<SkinnedMeshRenderer>() : null;
-        float top = mesh != null ? mesh.bounds.max.y - transform.position.y : 0f;
-        return top > 0.5f ? top * 0.93f : cameraTargetHeight * 0.7f;
-    }
-
-    void SetFirstPerson(bool on)
-    {
-        if (_firstPerson == on) return;
-        _firstPerson = on;
-        PlayerPrefs.SetInt(FirstPersonKey, on ? 1 : 0);
-        PlayerPrefs.Save();
-    }
-
     void Update()
     {
         if (EpisodeLoadingScreen.IsActive) return;
@@ -159,6 +147,7 @@ public class PlayerMovement : MonoBehaviour
             return;
         }
 
+        HandleUnstuck();   // R: emergency move to clear floor (PlayerMovement.Unstuck.cs)
         HandleMovement();
     }
 
@@ -173,21 +162,13 @@ public class PlayerMovement : MonoBehaviour
 
     bool IsOverlayOpen() => _hud != null && _hud.IsOverlayOpen();
 
-    // Cinematic transitions can reposition the player without retaining the previous camera yaw. The camera then
-    // cuts to its place behind the player instead of easing over from the old spot (through walls and doors).
-    public void ResetView(float yaw, float pitch = 15f)
-    {
-        _yaw = yaw;
-        _pitch = Mathf.Clamp(pitch, orbitPitchMin, orbitPitchMax);
-        _verticalVelocity = Vector3.zero;
-        _snapCamera = true;
-    }
-
     void HandleMovement()
     {
         // The Move action is a 2D composite: x = right-left, y = up-down (see GameControls.inputactions).
-        Vector2 moveInput = _input.Move != null ? _input.Move.ReadValue<Vector2>() : Vector2.zero;
-        moveInput += MobileInput.MoveAxis;
+        // With the mobile controls on, only the on-screen stick moves the player (no WASD / gamepad), and the other way round.
+        bool mobile = MobileControls.Enabled;
+        Vector2 moveInput = !mobile && _input.Move != null ? _input.Move.ReadValue<Vector2>() : Vector2.zero;
+        if (mobile) moveInput += MobileInput.MoveAxis;
         if (moveInput.sqrMagnitude > 1f) moveInput.Normalize();
         Vector3 input = new Vector3(moveInput.x, 0f, moveInput.y).normalized;
 
@@ -198,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
         Vector3 moveDir = forward * input.z + right * input.x;
 
         bool moving = moveDir.sqrMagnitude > 0.01f;
-        bool running = moving && _input.Run != null && _input.Run.IsPressed();
+        bool running = canRun && moving && !mobile && _input.Run != null && _input.Run.IsPressed();
 
         // The camera orbits freely; the player turns toward where they are walking.
         if (moving)
@@ -262,127 +243,17 @@ public class PlayerMovement : MonoBehaviour
     const float StuckSeconds = 1f;
     const float UnstickDistance = 0.25f;
 
-    void HandleCamera()
-    {
-        if (cameraTransform == null) return;
-
-        Vector2 look = ReadLook();
-        _yaw = Mathf.Repeat(_yaw + look.x, 360f);
-        _pitch -= look.y;
-        // In first person you can look right up at the sky; the orbit camera can't swing that low.
-        _pitch = Mathf.Clamp(_pitch, _firstPerson ? -FirstPersonPitchUp : orbitPitchMin, orbitPitchMax);
-
-        float zoom = 0f;
-        if (_input.ZoomIn != null && _input.ZoomIn.IsPressed()) zoom += zoomSpeed * Time.deltaTime;
-        if (_input.ZoomOut != null && _input.ZoomOut.IsPressed()) zoom -= zoomSpeed * Time.deltaTime;
-        // Two-finger swipe up / down on a trackpad (or a mouse wheel) zooms.
-        if (Mouse.current != null && Application.isFocused)
-            zoom += Mouse.current.scroll.ReadValue().y * scrollZoomSpeed;
-
-        bool viewButton = MobileInput.ConsumeViewToggle();   // the on-screen View button (mobile controls)
-        if (_firstPerson)
-        {
-            if (zoom < -0.0001f || viewButton) { SetFirstPerson(false); cameraOffset.z = -minDistance; _pitch = Mathf.Max(_pitch, orbitPitchMin); }   // scroll out: back to third person
-        }
-        else
-        {
-            cameraOffset.z += zoom;
-            if (allowFirstPerson && ((cameraOffset.z > -minDistance + 0.0001f && zoom > 0f) || viewButton)) SetFirstPerson(true);   // scroll in past the closest distance
-            cameraOffset.z = Mathf.Clamp(cameraOffset.z, -maxDistance, -minDistance);
-        }
-        ShotFocus.FirstPerson = _firstPerson;
-
-        _viewBlend = _snapCamera ? (_firstPerson ? 1f : 0f) : Mathf.MoveTowards(_viewBlend, _firstPerson ? 1f : 0f, viewSwitchSpeed * Time.deltaTime);
-
-        Quaternion rotation = Quaternion.Euler(_pitch, _yaw, 0f);
-        Vector3 targetPos = transform.position + Vector3.up * cameraTargetHeight;
-        Vector3 shoulderOffset = rotation * Vector3.right * cameraShoulderOffset;
-        Vector3 desiredPos = targetPos + shoulderOffset + rotation * cameraOffset;
-        desiredPos = ResolveCameraCollision(targetPos, desiredPos);
-        Vector3 eyePos = transform.position + Vector3.up * (firstPersonEyeHeight > 0f ? firstPersonEyeHeight : _eyeHeight);
-
-        // First person: the camera sits at the eyes and looks straight along the view direction, and the body turns with it.
-        if (_firstPerson && _viewBlend >= 1f)
-        {
-            cameraTransform.position = eyePos;
-            cameraTransform.rotation = rotation;
-            transform.rotation = Quaternion.Euler(0f, _yaw, 0f);
-            _snapCamera = false;
-            return;
-        }
-
-        // Easing out is smooth, but a wall pulls the camera in at once: easing in would leave it inside the wall for a moment.
-        Vector3 thirdPos = _snapCamera ? desiredPos : Vector3.Lerp(cameraTransform.position, desiredPos, cameraFollowSpeed * Time.deltaTime);
-        if (_cameraBlocked && (thirdPos - targetPos).sqrMagnitude > (desiredPos - targetPos).sqrMagnitude) thirdPos = desiredPos;
-        float t = Mathf.SmoothStep(0f, 1f, _viewBlend);
-        cameraTransform.position = Vector3.Lerp(thirdPos, eyePos, t);
-        Quaternion lookRotation = Quaternion.LookRotation(targetPos - cameraTransform.position + rotation * Vector3.forward * 0.0001f);
-        cameraTransform.rotation = t > 0f ? Quaternion.Slerp(lookRotation, rotation, t) : lookRotation;
-        _snapCamera = false;
-    }
-
-    // Camera turn for this frame, in degrees. Pointer movement (trackpad or mouse, through the Look action) turns
-    // the view whenever the game window has focus, captured cursor or not, so losing the capture (Esc, switching
-    // windows) never freezes the camera. A two-finger swipe left / right turns it too. Arrow keys and a gamepad
-    // stick turn at a steady rate. If the actions read nothing (map disabled by a rebind), the devices are read directly.
-    // With the mobile controls on, the on-screen look stick turns the view instead of touches: the Look action's
-    // <Pointer>/delta also follows a finger, so dragging the move stick or tapping a button would swing the camera.
-    Vector2 ReadLook()
-    {
-        var mouse = Mouse.current; var keyboard = Keyboard.current;
-        Vector2 pointer;
-        if (MobileControls.Enabled) pointer = mouse != null ? mouse.delta.ReadValue() : Vector2.zero;
-        else
-        {
-            pointer = _input.Look != null ? _input.Look.ReadValue<Vector2>() : Vector2.zero;
-            if (pointer == Vector2.zero && mouse != null) pointer = mouse.delta.ReadValue();
-        }
-        bool active = Application.isFocused || Cursor.lockState == CursorLockMode.Locked;
-        Vector2 look = active ? pointer * mouseSensitivity : Vector2.zero;
-        if (active && mouse != null) look.x += mouse.scroll.ReadValue().x * scrollTurnSpeed;
-
-        Vector2 keys = _input.LookKeys != null ? _input.LookKeys.ReadValue<Vector2>() : Vector2.zero;
-        if (keys == Vector2.zero && keyboard != null)
-            keys = new Vector2((keyboard.rightArrowKey.isPressed ? 1 : 0) - (keyboard.leftArrowKey.isPressed ? 1 : 0),
-                               (keyboard.upArrowKey.isPressed ? 1 : 0) - (keyboard.downArrowKey.isPressed ? 1 : 0));
-        return look + TouchDragLook() + (keys * keyLookSpeed + MobileInput.LookAxis * touchLookSpeed) * Time.deltaTime;
-    }
-
-    // Mobile: a finger dragged on open screen orbits the camera, as well as the look stick. Touches that start on a
-    // stick or a button belong to that control.
-    readonly List<RaycastResult> _uiHits = new List<RaycastResult>();
-    readonly Dictionary<int, bool> _touchOnUI = new Dictionary<int, bool>();
-    Vector2 TouchDragLook()
-    {
-        var screen = Touchscreen.current;
-        if (!MobileControls.Enabled || screen == null) return Vector2.zero;
-        Vector2 drag = Vector2.zero;
-        foreach (var touch in screen.touches)
-        {
-            var phase = touch.phase.ReadValue();
-            if (phase == UnityEngine.InputSystem.TouchPhase.None) continue;
-            int id = touch.touchId.ReadValue();
-            if (phase == UnityEngine.InputSystem.TouchPhase.Began || !_touchOnUI.ContainsKey(id))
-                _touchOnUI[id] = StartsOnUI(touch.startPosition.ReadValue());
-            if (phase == UnityEngine.InputSystem.TouchPhase.Moved && !_touchOnUI[id])
-                drag += touch.delta.ReadValue();
-            if (phase == UnityEngine.InputSystem.TouchPhase.Ended || phase == UnityEngine.InputSystem.TouchPhase.Canceled)
-                _touchOnUI.Remove(id);
-        }
-        return drag * touchDragSpeed;
-    }
-
-    bool StartsOnUI(Vector2 position)
-    {
-        if (EventSystem.current == null) return false;
-        _uiHits.Clear();
-        EventSystem.current.RaycastAll(new PointerEventData(EventSystem.current) { position = position }, _uiHits);
-        return _uiHits.Count > 0;
-    }
-
     void HandleCursor()
     {
         if (Mouse.current == null) return;
+
+        // The mobile controls are pressed with the pointer, so it is never captured while they are on.
+        if (MobileControls.Enabled)
+        {
+            if (Cursor.lockState != CursorLockMode.None) Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            return;
+        }
 
         if (IsOverlayOpen())
         {
@@ -404,57 +275,6 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void OnEnable() { _recapture = true; UpdateCrosshair(); }
-
-    // Sphere-casts from the player toward the desired camera position and pulls the camera
-    // in front of any geometry it would otherwise clip through.
-    Vector3 ResolveCameraCollision(Vector3 targetPos, Vector3 desiredPos)
-    {
-        Vector3 toCamera = desiredPos - targetPos;
-        float distance = toCamera.magnitude;
-        if (distance <= 0.01f)
-            return desiredPos;
-
-        Vector3 direction = toCamera / distance;
-        // Wide enough for the whole near plane, so a wall beside the camera never shows through a corner of the screen,
-        // and back faces count too: some city walls are single-sided and the camera would pass through from behind.
-        float radius = cameraCollisionRadius;
-        var cam = cameraTransform.GetComponent<Camera>();
-        if (cam != null)
-        {
-            float halfHeight = cam.nearClipPlane * Mathf.Tan(cam.fieldOfView * 0.5f * Mathf.Deg2Rad);
-            radius = Mathf.Max(radius, new Vector3(halfHeight * cam.aspect, halfHeight, cam.nearClipPlane).magnitude + 0.02f);
-        }
-        bool backfaces = Physics.queriesHitBackfaces;
-        Physics.queriesHitBackfaces = true;
-        RaycastHit[] hits = Physics.SphereCastAll(
-            targetPos,
-            radius,
-            direction,
-            distance,
-            cameraCollisionMask,
-            QueryTriggerInteraction.Ignore);
-        // A thin cast as well: the wide one ignores what it already touches at the start (a wall the player leans on).
-        RaycastHit[] thin = Physics.SphereCastAll(targetPos, 0.05f, direction, distance, cameraCollisionMask, QueryTriggerInteraction.Ignore);
-        Physics.queriesHitBackfaces = backfaces;
-        if (thin.Length > 0) { var all = new RaycastHit[hits.Length + thin.Length]; hits.CopyTo(all, 0); thin.CopyTo(all, hits.Length); hits = all; }
-
-        float nearestDistance = distance;
-        for (int i = 0; i < hits.Length; i++)
-        {
-            Transform hitTransform = hits[i].transform;
-            if (hitTransform == transform || hitTransform.IsChildOf(transform) || hits[i].distance <= 0f)
-                continue;
-
-            if (hits[i].distance < nearestDistance)
-                nearestDistance = hits[i].distance;
-        }
-
-        _cameraBlocked = nearestDistance < distance;
-        if (_cameraBlocked)
-            return targetPos + direction * Mathf.Max(0.1f, nearestDistance - cameraCollisionPadding);
-
-        return desiredPos;
-    }
 
     // The crosshair is a small UI Toolkit element (Assets/UI Toolkit/Crosshair.uxml); showCrosshair, crosshairSize and
     // crosshairColor on this component still control it.

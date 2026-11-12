@@ -1,0 +1,60 @@
+{
+  "id": "city-traffic-vehicle",
+  "title": "CityTrafficVehicle.cs",
+  "path": "Assets/Scripts/Vehicles/CityTrafficVehicle.cs",
+  "summary": "Drives a city vehicle round a closed loop of road points for ever, and loops the model's own wheel-roll and body-vibration clips at the speed that matches the distance driven.",
+  "notes": [
+    {
+      "match": "public Vector3[] path;",
+      "text": "The closed loop to drive, in world space. The last point joins the first. CityTrafficBuilder fills it from the city's road grid, so each scene's own scale and turn are already applied."
+    },
+    {
+      "match": "public float speed = 18f;",
+      "text": "World units per second. The builder sets it in model units per second times the city's scale, so a city at 2.5x drives 2.5x as fast."
+    },
+    {
+      "match": "public Vector3 modelForward = Vector3.left;",
+      "text": "The vehicle's front in its own space. The .glb models import facing -X, which is what lets one rotation line them up with the road."
+    },
+    {
+      "match": "public AnimationClip[] clips;",
+      "text": "The model's own looping clips: one wheel roll per wheel and one body vibration. The prefab builder collects them from the .glb."
+    },
+    {
+      "match": "public float modelRollSpeed = 2.5f;",
+      "text": "How fast the wheel clips roll the tyres without slipping: 2 turns per 2.03 s loop times the wheel radius. It differs per vehicle (2.2 for the sports car, 4.3 for the bus)."
+    },
+    {
+      "match": "cumulative[i + 1] = cumulative[i] + Vector3.Distance(path[i], path[(i + 1) % path.Length]);",
+      "text": "Running distance along the loop, including the closing segment back to the start. It lets a distance be turned into a position with a binary search."
+    },
+    {
+      "match": "fix = Quaternion.Inverse(Quaternion.LookRotation(modelForward));",
+      "text": "LookRotation(heading) * fix turns the model's own front onto the direction of travel, whichever axis the model faces."
+    },
+    {
+      "match": "public void PlaceAt(float at)",
+      "text": "Puts the vehicle at a distance along the loop. The builder uses it to spread the vehicles out; Update uses it every frame."
+    },
+    {
+      "match": "distance = Mathf.Repeat(at, length);",
+      "text": "Wraps past the end back to the start, so the vehicle loops forever."
+    },
+    {
+      "match": "while (hi - lo > 1) { int mid = (lo + hi) / 2; if (cumulative[mid] <= distance) lo = mid; else hi = mid; }",
+      "text": "Binary search for the segment that holds this distance."
+    },
+    {
+      "match": "wheelClock += dt * speed / Mathf.Max(0.01f, transform.lossyScale.x) / Mathf.Max(0.01f, modelRollSpeed);",
+      "text": "The wheel clip's own clock runs at the driving speed in model units divided by the speed the clip rolls at, so the tyres turn exactly as fast as the road passes."
+    },
+    {
+      "match": "bodyClock += dt;",
+      "text": "The body vibration runs in real time."
+    },
+    {
+      "match": "clip.SampleAnimation(animationRoot, Mathf.Repeat(body ? bodyClock : wheelClock, clip.length));",
+      "text": "The clips are sampled by hand instead of through an Animator controller. Repeat makes each one loop, and it only moves the transforms that clip animates (one wheel, or the body)."
+    }
+  ]
+}

@@ -21,6 +21,8 @@ MonoBehaviour:
     track: undertale
   - scenePrefix: Chapter 1
     track: ambient royalty free
+  - scenePrefix: Chapter 1 - Episode 1
+    track: animal crossing
   - scenePrefix: Chapter 2
     track: animal crossing
   - scenePrefix: Chapter 3

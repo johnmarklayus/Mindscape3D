@@ -339,7 +339,10 @@ const actions: Record<string, (body: any, request: Request) => Promise<unknown>>
   async refresh(body) {
     const refreshToken = text(body.refresh_token);
     const r = await gotrue("token?grant_type=refresh_token", { refresh_token: refreshToken });
-    if (!r.ok || !r.json.access_token) throw new Fail("Your session has expired. Please log in again.", SESSION_EXPIRED);
+    // Only a refused token (400/401/403: unknown, revoked or already used) ends the session. A rate limit, a server
+    // error or a network hiccup is "try again later", so the game keeps the player signed in and retries.
+    if (!r.ok && [400, 401, 403].includes(r.status)) throw new Fail("Your session has expired. Please log in again.", SESSION_EXPIRED);
+    if (!r.ok || !r.json.access_token) throw new Fail("Could not refresh the session right now. Try again in a moment.");
     return { session: { access_token: r.json.access_token, refresh_token: r.json.refresh_token, expires_in: r.json.expires_in } };
   },
 

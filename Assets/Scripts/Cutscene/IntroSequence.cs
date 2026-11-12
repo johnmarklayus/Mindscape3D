@@ -27,6 +27,7 @@ public sealed class IntroSequence : MonoBehaviour
 
     VideoPlayer player;
     AudioSource videoAudio;
+    AudioClip soundtrack;
     RenderTexture videoTarget;
     RenderTexture[] glowSteps;   // the title, halved three times: stretched back up it is a soft blur of the logo
     Texture glowSource;
@@ -153,12 +154,16 @@ public sealed class IntroSequence : MonoBehaviour
 
         bool finished = false;
         player.loopPointReached += _ => finished = true;
+        if (soundtrack != null) player.started += _ => { videoAudio.time = 0; videoAudio.Play(); };
         player.Play();
         StartCoroutine(Fade(videoGroup, 1, 0.6f));
         var showSkip = StartCoroutine(ShowSkip());
         while (!finished && !skipRequested && !videoFailed)
         {
             if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame) skipRequested = true;
+            // In case the video never reported starting: join the soundtrack in at the video's time.
+            if (soundtrack != null && !videoAudio.isPlaying && player.isPlaying && player.time > .3f && player.time < soundtrack.length - 1)
+            { videoAudio.time = (float)player.time; videoAudio.Play(); }
             yield return null;
         }
 
@@ -174,6 +179,7 @@ public sealed class IntroSequence : MonoBehaviour
         }
         videoGroup.alpha = 0;
         player.Stop();
+        videoAudio.Stop();
         videoFrame.texture = null;
         videoTarget.Release();
     }
@@ -310,8 +316,12 @@ public sealed class IntroSequence : MonoBehaviour
         player.isLooping = false;
         player.source = VideoSource.Url;
         player.renderMode = VideoRenderMode.RenderTexture;
-        player.audioOutputMode = VideoAudioOutputMode.AudioSource;
-        player.SetTargetAudioSource(0, videoAudio);
+        // The soundtrack plays from its own clip (Resources/Intro/IntroSoundtrack, taken from the video) through the
+        // game's audio, and the video itself plays muted. Phone browsers only let a video play with sound when it starts
+        // inside the tap itself, so the intro was silent on phones; the game's audio is unlocked by the Proceed tap.
+        soundtrack = Resources.Load<AudioClip>("Intro/IntroSoundtrack");
+        if (soundtrack != null) { player.audioOutputMode = VideoAudioOutputMode.None; videoAudio.clip = soundtrack; videoAudio.playOnAwake = false; }
+        else { player.audioOutputMode = VideoAudioOutputMode.AudioSource; player.SetTargetAudioSource(0, videoAudio); }
 
         // Game title over black, with the "press any button" prompt beneath it.
         // The main menu's artwork (MenuArt/Background3D, the sunset hill) sits behind it, so the menu follows on naturally.

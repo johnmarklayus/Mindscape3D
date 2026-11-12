@@ -26,7 +26,7 @@ Episode 4 ends with "Begin Chapter 2", which opens Family Expectations.
 
 ## Database
 
-`Assets/Database/MindscapeDatabase.cs` stores everything in SQLite at `Application.persistentDataPath/mindscape.db` and mirrors it to local storage (PlayerPrefs). `Mindscape > Chapter 1 - Academic Pressure > Reveal Database File` shows the file.
+`Assets/Scripts/Data/MindscapeDatabase.cs` stores everything in SQLite at `Application.persistentDataPath/mindscape.db` and mirrors it to local storage (PlayerPrefs). `Mindscape > Chapter 1 - Academic Pressure > Reveal Database File` shows the file.
 
 - Tables: `players` (name), `choices` (every decision with chapter, episode, key, value, time), `journal_entries`, `assessments`.
 - SQLite comes from the operating system (`libsqlite3` on macOS/Linux, `winsqlite3.dll` on Windows 10+). To pin a version, drop the official `sqlite3.dll` into `Assets/Plugins`; it is loaded first.

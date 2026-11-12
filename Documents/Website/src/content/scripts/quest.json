@@ -1,0 +1,182 @@
+{
+  "id": "quest",
+  "title": "Quest.cs",
+  "path": "Assets/Scripts/Quests/Quest.cs",
+  "summary": "The win/lose condition for an episode: collectible/stress/NPC criteria, an optional countdown timer, and the UnityEvents + scene-unlock logic that fire on success or failure.",
+  "notes": [
+    {
+      "match": "[AddComponentMenu(\"Mindscape/Quest\")]",
+      "text": "Groups this component under 'Mindscape/Quest' in the Add Component search instead of the root list.",
+      "span": 1
+    },
+    {
+      "match": "public string questId = \"quest-id\";",
+      "text": "Stable identifier for save data / cross-referencing — separate from the display name so renaming the quest doesn't break anything referencing it by id."
+    },
+    {
+      "match": "public string questName = \"New Quest\";",
+      "text": "What shows in the Journal UI."
+    },
+    {
+      "match": "public bool activeOnStart = true;",
+      "text": "Whether this quest starts already active (most do) or needs to be turned on later via ActivateQuest()."
+    },
+    {
+      "match": "public List<QuestCollectibleRequirement> requiredCollectibles = new List<QuestCollectibleRequirement>();",
+      "text": "The list of QuestCollectibleRequirement rows described above."
+    },
+    {
+      "match": "[Tooltip(\"NPC names the player must finish talking to. Names are matched without case sensitivity.\")]",
+      "text": "Plain strings, not NPC references — matched by name so quests don't need a hard scene reference to specific NPC GameObjects."
+    },
+    {
+      "match": "PlayerControls playerControls;",
+      "text": "Cached so IsStressAccepted doesn't call FindAnyObjectByType every frame."
+    },
+    {
+      "match": "public float EpisodeDuration => Mathf.Max(0f, episodeDurationMinutes * 60f + episodeDurationSeconds);",
+      "text": "EpisodeDuration is computed from minutes+seconds every time rather than cached, since either field could change in the Inspector during Play mode."
+    },
+    {
+      "match": "Time.timeScale = 0f;",
+      "nth": 1,
+      "text": "Time.timeScale = 0 freezes gameplay while the completion modal is up — Quest.Update uses unscaledDeltaTime specifically so its own timer logic still works if ever needed after this point."
+    },
+    {
+      "match": "[Serializable]",
+      "span": 22,
+      "text": "One row of the 'Required Collectibles' list: either drag a specific CollectibleItem, or type a raw id string — RequiredId prefers the linked item's own itemId if one is assigned."
+    },
+    {
+      "match": "public static class QuestProgress",
+      "span": 8,
+      "text": "A tiny static pub/sub event completely decoupled from any specific Quest instance — any NPC conversation finishing anywhere raises this once, and every currently-enabled Quest's OnEnable subscription picks it up."
+    },
+    {
+      "match": "public bool requireStressRange;",
+      "span": 3,
+      "text": "Optional stress-range requirement — both bounds default such that it's effectively disabled until requireStressRange is checked."
+    },
+    {
+      "match": "[Min(0)] public int episodeDurationMinutes = 5;",
+      "span": 2,
+      "text": "Timer fields split into minutes+seconds for a friendlier Inspector; both 0 disables the timer entirely (see EpisodeDuration below)."
+    },
+    {
+      "match": "public UnityEvent onQuestCompleted;",
+      "span": 2,
+      "text": "Designer-hookable UnityEvents for anything beyond the automatic unlock-next-chapter behavior — e.g. play a sound, trigger an animation."
+    },
+    {
+      "match": "[SerializeField, HideInInspector] bool questActive;",
+      "span": 3,
+      "text": "Runtime state that needs to survive between Inspector refreshes but shouldn't be hand-edited, hence HideInInspector while still [SerializeField] (so it round-trips through play mode / prefab changes)."
+    },
+    {
+      "match": "public bool IsActive => questActive;",
+      "span": 4,
+      "text": "Small public read-only surface QuestHUDController and the custom Inspector query to display status."
+    },
+    {
+      "match": "public string RemainingEpisodeTimeText",
+      "span": 8,
+      "text": "Formats the countdown as MM:SS for the Journal HUD."
+    },
+    {
+      "match": "public bool HasCriteria",
+      "span": 17,
+      "text": "A quest with truly nothing configured (no collectibles, no stress range, no NPCs) is considered to have 'no criteria' — see EvaluateNow, which refuses to auto-complete such a quest."
+    },
+    {
+      "match": "void Awake()",
+      "span": 6,
+      "text": "Caches PlayerControls, sets the initial active/inactive state from activeOnStart, and starts the countdown fresh."
+    },
+    {
+      "match": "void OnEnable()",
+      "span": 8,
+      "text": "Subscribes to/unsubscribes from the static NPCConversationCompleted event only while this component is enabled — a standard pattern to avoid leaking subscriptions on disabled/destroyed objects."
+    },
+    {
+      "match": "void Update()",
+      "span": 14,
+      "text": "Every frame while active and not yet completed: re-check criteria, and separately tick the countdown (using unscaled time so it isn't affected by a paused game-over screen elsewhere) and fail the episode if it hits zero."
+    },
+    {
+      "match": "public void ActivateQuest()",
+      "span": 6,
+      "text": "Public API for designers to turn a quest on via a UnityEvent elsewhere (e.g. a trigger volume) — resets the timer unless the episode already ended."
+    },
+    {
+      "match": "public void DeactivateQuest()",
+      "span": 4,
+      "text": "Turns a quest off without resetting its progress."
+    },
+    {
+      "match": "public void ResetQuest()",
+      "span": 8,
+      "text": "Full reset back to a fresh, replayable state — used when retrying a failed episode."
+    },
+    {
+      "match": "public bool EvaluateNow()",
+      "span": 17,
+      "text": "The actual evaluation: bails early if inactive/already completed/has no criteria, checks all three criteria types, and on success persists the chapter unlock, fires the UnityEvent, freezes the game, and shows the completion screen."
+    },
+    {
+      "match": "void ResetEpisodeTimer()",
+      "span": 4,
+      "text": "Resets the countdown to the full configured duration."
+    },
+    {
+      "match": "void FailEpisode()",
+      "span": 9,
+      "text": "Mirror image of success: marks the episode ended (but not completed), fires the failure UnityEvent, freezes time, and shows the game-over screen."
+    },
+    {
+      "match": "public bool AreCollectiblesComplete()",
+      "span": 15,
+      "text": "True automatically if there are no collectible requirements at all; otherwise every requirement must be satisfied by the shared BagUIController instance."
+    },
+    {
+      "match": "public bool IsStressAccepted()",
+      "span": 10,
+      "text": "True automatically if the stress-range requirement isn't enabled; otherwise checks the player's current stress against the (auto-sorted) min/max bounds."
+    },
+    {
+      "match": "public bool AreNPCsComplete()",
+      "span": 22,
+      "text": "True only if every non-blank required NPC name has a case-insensitive match in talkedToNPCNames."
+    },
+    {
+      "match": "public int GetCollectibleProgress(QuestCollectibleRequirement requirement)",
+      "span": 5,
+      "text": "Used by the Journal UI to show 'x / y' progress per collectible requirement."
+    },
+    {
+      "match": "public bool HasTalkedToNPC(string npcName)",
+      "span": 8,
+      "text": "Used both internally (AreNPCsComplete) and by the Journal UI to show a per-NPC checkmark."
+    },
+    {
+      "match": "void RecordNPCConversation(string npcName)",
+      "span": 6,
+      "text": "The NPCConversationCompleted event handler: records the name (once) and immediately re-evaluates, so a quest can complete the instant the last required NPC talk finishes rather than waiting for the next Update."
+    },
+    {
+      "match": "public QuestMinigame minigame;",
+      "text": "Any QuestMinigame fits here now — the breathing exercise, the Worry Courtroom, or your own."
+    },
+    {
+      "match": "bool minigameRunning = playerControls != null && playerControls.minigameOpen;",
+      "text": "The episode clock waits while a minigame is open, so a few minutes in the courtroom don't eat the timer."
+    },
+    {
+      "match": "public void NotifyMinigameClosed(QuestMinigame minigame)",
+      "text": "The player left before finishing. Resetting 'triggered' lets the same trigger open it again."
+    },
+    {
+      "match": "if (HasTalkedToNPC(npcName)) { CheckMinigameTriggersForNPC(npcName); return; }",
+      "text": "Talking to an NPC again still re-checks their minigame trigger, so a minigame closed early can be reopened this way."
+    }
+  ]
+}

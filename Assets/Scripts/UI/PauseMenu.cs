@@ -124,6 +124,7 @@ public class PauseMenu : MonoBehaviour, IPausable
         _btnSettingsBack = _root.Q<Button>("btn-settings-back");
         MenuIcon.AttachIconOnly(_btnSettingsBack, MenuIcon.Kind.Back, "Back to pause menu");
         _btnSettingsDone = _root.Q<Button>("btn-settings-done");
+        SetupTooltips();
 
         _sliderMusic = _root.Q<Slider>("slider-music");
         _sliderSfx = _root.Q<Slider>("slider-sfx");
@@ -262,8 +263,55 @@ public class PauseMenu : MonoBehaviour, IPausable
     {
     }
 
+    // ---------------------------------------------------------------- tooltips
+    // The pause buttons are icons only. Pointing at one (or moving the keyboard / gamepad focus onto it, or pressing it on
+    // a touch screen) shows a small popup with what it does, just under the button. A Button's own `tooltip` is shown
+    // only in the Editor, so the popup is drawn here from that text.
+    Label _tooltip;
+    readonly System.Collections.Generic.HashSet<Button> _tipped = new System.Collections.Generic.HashSet<Button>();
+
+    void SetupTooltips()
+    {
+        if (_root == null) return;
+        if (_tooltip == null || _tooltip.panel == null)
+        {
+            _tooltip = new Label { name = "menu-tooltip", pickingMode = PickingMode.Ignore };
+            _tooltip.AddToClassList("menu-tooltip");
+            _tooltip.AddToClassList("hidden");
+            _tooltip.style.position = Position.Absolute;
+            _tooltip.style.translate = new Translate(Length.Percent(-50), 0);
+            _root.Add(_tooltip);
+            _tipped.Clear();
+        }
+        foreach (var button in _root.Query<Button>().ToList())
+        {
+            if (string.IsNullOrEmpty(button.tooltip) || !_tipped.Add(button)) continue;
+            var b = button;
+            b.RegisterCallback<PointerEnterEvent>(_ => ShowTip(b));
+            b.RegisterCallback<PointerDownEvent>(_ => ShowTip(b), TrickleDown.TrickleDown);
+            b.RegisterCallback<PointerLeaveEvent>(_ => HideTip());
+            b.RegisterCallback<FocusInEvent>(_ => ShowTip(b));
+            b.RegisterCallback<FocusOutEvent>(_ => HideTip());
+        }
+    }
+
+    void ShowTip(Button button)
+    {
+        if (_tooltip == null || button == null || button.resolvedStyle.display == DisplayStyle.None) return;
+        _tooltip.text = button.tooltip;
+        Rect r = button.worldBound;
+        Vector2 at = _root.WorldToLocal(new Vector2(r.center.x, r.yMax));
+        _tooltip.style.left = at.x;
+        _tooltip.style.top = at.y + 8;
+        _tooltip.RemoveFromClassList("hidden");
+        _tooltip.BringToFront();
+    }
+
+    void HideTip() { if (_tooltip != null) _tooltip.AddToClassList("hidden"); }
+
     public void OpenSettings()
     {
+        HideTip();
         if (_pagePause != null) _pagePause.AddToClassList("hidden");
         if (_pageSettings != null) _pageSettings.RemoveFromClassList("hidden");
         MusicManager.SetDucked(true); // quieter music so the volume sliders can be heard
@@ -281,6 +329,7 @@ public class PauseMenu : MonoBehaviour, IPausable
     public void OpenSave()
     {
         if (StoryEpisode == null) return;
+        HideTip();
         _confirmSlot = -1;
         if (_saveStatus != null) _saveStatus.text = "";
         RefreshSaveSlots();
@@ -319,6 +368,7 @@ public class PauseMenu : MonoBehaviour, IPausable
 
     void ShowPausePanel()
     {
+        HideTip();
         if (_pageSettings != null) _pageSettings.AddToClassList("hidden");
         if (_pageSave != null) _pageSave.AddToClassList("hidden");
         if (_pagePause != null) _pagePause.RemoveFromClassList("hidden");
@@ -336,6 +386,7 @@ public class PauseMenu : MonoBehaviour, IPausable
     public void SetVisible(bool visible)
     {
         _isPaused = visible;
+        HideTip();
 
         if (_overlay == null && _root != null)
             _overlay = _root.Q<VisualElement>("pause-overlay");

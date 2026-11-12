@@ -440,3 +440,16 @@
     width: 44px;
     height: 44px;
 }
+
+/* Popup under an icon button saying what it does (PauseMenu.SetupTooltips) */
+.menu-tooltip {
+    padding: 5px 10px;
+    background-color: #0F181B;
+    border-width: 1px;
+    border-color: #DBB36F;
+    border-radius: 6px;
+    color: #F2E8D1;
+    font-size: 14px;
+    white-space: nowrap;
+    -unity-text-align: middle-center;
+}
