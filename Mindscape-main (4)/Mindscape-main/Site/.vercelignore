@@ -1,9 +1,0 @@
-# What `vercel` does NOT upload. public/game (the WebGL game) is deliberately NOT listed: it must be uploaded.
-node_modules
-.next
-.env*
-!.env.example
-*.tsbuildinfo
-.DS_Store
-# dev-only links to the local builds; production uses NEXT_PUBLIC_DOWNLOAD_*
-public/downloads
