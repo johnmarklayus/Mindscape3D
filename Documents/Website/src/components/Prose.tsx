@@ -9,9 +9,9 @@ export function Lede({ children }: { children: ReactNode }) {
   return <p className="text-muted-foreground text-[15px] mb-6 leading-relaxed">{children}</p>
 }
 
-export function H2({ children }: { children: ReactNode }) {
+export function H2({ children, id }: { children: ReactNode; id?: string }) {
   return (
-    <h2 className="text-xl font-semibold mt-9 mb-2.5 pt-2 border-t border-border first:border-t-0 first:pt-0 first:mt-0">
+    <h2 id={id} className="scroll-mt-20 text-xl font-semibold mt-9 mb-2.5 pt-2 border-t border-border first:border-t-0 first:pt-0 first:mt-0">
       {children}
     </h2>
   )

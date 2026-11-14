@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce0345c086f5f43469e85852ea09b554, type: 3}
+  m_Name: Player Settings - House at Night
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSettings
+  moveSpeed: 7
+  rotationSpeed: 12
+  gravity: -20
+  runSpeed: 16.8
+  canRun: 1
+  cameraOffset: {x: 0, y: 0.63, z: -4.9}
+  cameraFollowSpeed: 10
+  mouseSensitivity: 0.25
+  keyLookSpeed: 120
+  touchLookSpeed: 150
+  scrollTurnSpeed: 0.5
+  scrollZoomSpeed: 0.02
+  cameraTargetHeight: 2.94
+  cameraShoulderOffset: 0.77
+  orbitPitchMin: -10
+  orbitPitchMax: 80
+  touchDragSpeed: 0.18
+  cameraCollisionRadius: 0.25
+  cameraCollisionPadding: 0.15
+  cameraCollisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  cameraWallStopDistance: 1.5
+  zoomSpeed: 5
+  minDistance: 1.6800001
+  maxDistance: 7
+  allowFirstPerson: 1
+  viewSwitchSpeed: 8
+  firstPersonEyeHeight: 0
+  showCrosshair: 1
+  crosshairSize: 5
+  crosshairColor: {r: 1, g: 1, b: 1, a: 1}

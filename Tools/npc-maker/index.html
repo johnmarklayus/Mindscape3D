@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NPC Maker</title>
+  </head>
+  <body>
+    <div id="app">
+      <main class="workspace">
+        <aside class="inspector">
+          <span id="status" class="visually-hidden" role="status" aria-live="polite">Loading model…</span>
+          <div class="field"><label for="name">Character name</label><input id="name" type="text" value="New Boy NPC" maxlength="64" /></div>
+          <div class="section-label">BASE MODEL</div>
+          <div class="field"><span class="field-label">Model</span><div class="hair-picker" role="group" aria-label="Base model"><button id="previous-model" type="button" aria-label="Previous base model">←</button><span id="base-model-label" aria-live="polite">Boy</span><button id="next-model" type="button" aria-label="Next base model">→</button></div></div>
+          <div class="section-label">HAIR &amp; HAT</div>
+          <div class="field"><span class="field-label">Style</span><div class="hair-picker" role="group" aria-label="Hair style"><button id="previous-hair" type="button" aria-label="Previous hair style">←</button><span id="hair-label" aria-live="polite"></span><button id="next-hair" type="button" aria-label="Next hair style">→</button></div></div>
+          <div class="field"><span class="field-label">Hat</span><div class="hair-picker" role="group" aria-label="Hat"><button id="previous-hat" type="button" aria-label="Previous hat">←</button><span id="hat-label" aria-live="polite"></span><button id="next-hat" type="button" aria-label="Next hat">→</button></div></div>
+          <div class="section-label">FACE</div>
+          <div class="field"><span class="field-label">Eyes</span><div class="hair-picker" role="group" aria-label="Eyes"><button id="previous-eyes" type="button" aria-label="Previous eyes">←</button><span id="eyes-label" aria-live="polite"></span><button id="next-eyes" type="button" aria-label="Next eyes">→</button></div></div>
+          <div class="field"><span class="field-label">Nose</span><div class="hair-picker" role="group" aria-label="Nose"><button id="previous-nose" type="button" aria-label="Previous nose">←</button><span id="nose-label" aria-live="polite"></span><button id="next-nose" type="button" aria-label="Next nose">→</button></div></div>
+          <div class="field"><span class="field-label">Mouth</span><div class="hair-picker" role="group" aria-label="Mouth"><button id="previous-mouth" type="button" aria-label="Previous mouth">←</button><span id="mouth-label" aria-live="polite"></span><button id="next-mouth" type="button" aria-label="Next mouth">→</button></div></div>
+          <div class="section-label">SHIRT</div>
+          <div class="field"><span class="field-label">Design</span><div class="hair-picker" role="group" aria-label="Shirt design"><button id="previous-shirt" type="button" aria-label="Previous shirt design">←</button><span id="shirt-label" aria-live="polite"></span><button id="next-shirt" type="button" aria-label="Next shirt design">→</button></div></div>
+          <label class="color-row" for="color-design"><span>Design colour</span><span class="color-control"><span id="value-design"></span><input id="color-design" type="color" aria-label="Design colour"></span></label>
+          <div class="section-label">MATERIAL COLORS</div>
+          <div id="colors"></div>
+          <button id="reset-character" class="reset">↺ &nbsp; Reset to base model</button>
+          <div class="sidebar-actions"><button id="export-json" class="button ghost">Save recipe</button><button id="export-glb" class="button primary" disabled>Export model <span aria-hidden="true">↗</span></button></div>
+          <p class="export-note">The exported GLB keeps the original mesh and armature. Assign NPC animations and controller in Unity.</p>
+        </aside>
+        <section class="viewport" aria-label="3D character preview">
+          <div id="canvas"></div>
+          <div class="view-top"><span class="eyebrow">LIVE PREVIEW</span><span id="model-label">DEFAULT BOY</span></div>
+          <div class="animation-bar" aria-label="Animation viewer">
+            <span class="animation-label">ANIMATION</span>
+            <div class="animation-modes" role="group" aria-label="Animation preview">
+              <button class="animation-mode" data-animation="tpose">T-pose</button>
+              <button class="animation-mode active" data-animation="idle">Idle</button>
+              <button class="animation-mode" data-animation="walk">Walk</button>
+              <button class="animation-mode" data-animation="run">Run</button>
+              <button class="animation-mode" data-animation="conversation">Talk</button>
+            </div>
+            <button id="toggle-animation" class="animation-toggle" aria-label="Pause animation">Ⅱ</button>
+          </div>
+          <div class="view-bottom"><span>Drag to rotate <i>·</i> Scroll to zoom</span><button id="reset-view" title="Reset camera">Reset view ↺</button></div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

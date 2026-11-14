@@ -6368,11 +6368,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: 5215bb6a31e1d430a873282829300cda, type: 2}
   moveSpeed: 7
   rotationSpeed: 12
   gravity: -20
   animator: {fileID: 1750024237}
   runSpeed: 16.8
+  canRun: 1
   cameraTransform: {fileID: 429370817}
   cameraOffset: {x: 0, y: 0.63, z: -4.9}
   cameraFollowSpeed: 10
@@ -6391,6 +6393,7 @@ MonoBehaviour:
   cameraCollisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  cameraWallStopDistance: 1.5
   zoomSpeed: 5
   minDistance: 1.6800001
   maxDistance: 7
@@ -27206,6 +27209,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2003644500}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1430604018
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1430604019}
+  - component: {fileID: 1430604020}
+  m_Layer: 0
+  m_Name: Corner Seat camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1430604019
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430604018}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.16663833, y: -0.3044596, z: 0.054188095, w: 0.93626904}
+  m_LocalPosition: {x: -11.099998, y: 2.072, z: -5.21}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2069371182}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1430604020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1430604018}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Corner/Seat camera
+  kind: 2
+  note: The shot as Joey sits down.
 --- !u!1 &1430985178
 GameObject:
   m_ObjectHideFlags: 0
@@ -29047,6 +29097,54 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1483582650}
   m_Mesh: {fileID: 2164553512318144208, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &1484154851
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1484154852}
+  - component: {fileID: 1484154853}
+  m_Layer: 0
+  m_Name: Corner Seat
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1484154852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484154851}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 1, z: -0, w: 0}
+  m_LocalPosition: {x: -12.699999, y: 0.57199997, z: -3.0100002}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2069371182}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1484154853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1484154851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Corner/Seat
+  kind: 1
+  note: 'Where Joey sits by the window: the top of the cushion; the arrow is the
+    way Joey faces.'
 --- !u!1 &1488959844
 GameObject:
   m_ObjectHideFlags: 0
@@ -32327,6 +32425,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1648171462}
   m_Mesh: {fileID: 1028430868811471413, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &1648896168
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1648896169}
+  - component: {fileID: 1648896170}
+  m_Layer: 0
+  m_Name: Corner Phone camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1648896169
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648896168}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.16921243, y: -0.27877933, z: 0.04997086, w: 0.9440086}
+  m_LocalPosition: {x: -11.599998, y: 1.872, z: -4.71}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2069371182}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1648896170
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1648896168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Corner/Phone camera
+  kind: 2
+  note: The shot while Joey checks the phone.
 --- !u!1 &1651571925
 GameObject:
   m_ObjectHideFlags: 0
@@ -34911,6 +35056,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1779161095}
   m_Mesh: {fileID: 4028466348490410730, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &1783379555
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1783379556}
+  - component: {fileID: 1783379557}
+  m_Layer: 0
+  m_Name: Corner Thinking camera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1783379556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783379555}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.12542695, y: -0.40180212, z: 0.055663325, w: 0.9053865}
+  m_LocalPosition: {x: -10.599998, y: 1.872, z: -4.9100003}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2069371182}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1783379557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1783379555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Corner/Thinking camera
+  kind: 2
+  note: The slow glide during Joey's thoughts.
 --- !u!1 &1788101027
 GameObject:
   m_ObjectHideFlags: 0
@@ -35096,6 +35288,7 @@ Transform:
   - {fileID: 1222926633}
   - {fileID: 1433147784}
   - {fileID: 1179578809}
+  - {fileID: 2069371182}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1795503439
@@ -39955,6 +40148,41 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2069332935}
   m_Mesh: {fileID: 378337144190351685, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &2069371181
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2069371182}
+  m_Layer: 0
+  m_Name: Story Markers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2069371182
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2069371181}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1484154852}
+  - {fileID: 1430604019}
+  - {fileID: 1783379556}
+  - {fileID: 1648896169}
+  m_Father: {fileID: 1793730778}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &2073681867
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -7,6 +7,7 @@ namespace Mindscape.SocialDynamics
 {
     // Pieces Chapter 3 builds at runtime, so the scenes need no extra set-up:
     //   LoungeWindow the reunion hall's window by the quiet corner (Episodes 2-6).
+    //   CornerSeat   the lounge sofa seat nearest the quiet corner, where Joey sits in Episode 4.
     //   Park         Episode 5's little park with a fountain and lights, where Justin finds Joey.
     //   MemoryFrame  a framed picture with a caption that lights up out of the dark.
     //   DreamSpace   Episode 8's dim, open dream: a path toward a far light, memory frames along both sides.
@@ -142,6 +143,60 @@ namespace Mindscape.SocialDynamics
             }
             dream.frames = frames.ToArray();
             return dream;
+        }
+
+        // ---------------------------------------------------------------- the corner seat
+
+        // Episode 4 "Sit by the window": the hall's lounge furniture is one merged mesh, so the seat is found by its shape.
+        // The floor round 'spot' is sampled from above; a seat is a flat patch at chair height with a backrest right
+        // behind it (and the same cushion height to both sides, so not an armrest). Returns the seat cell nearest 'spot':
+        // 'seatTop' is the top of the cushion, 'facing' points away from the backrest.
+        public static bool CornerSeat(Vector3 spot, out Vector3 seatTop, out Vector3 facing, float radius = 6f)
+        {
+            seatTop = spot; facing = Vector3.forward;
+            float floorY = spot.y;
+            if (Physics.Raycast(spot + Vector3.up, Vector3.down, out var floorHit, 6, ~0, QueryTriggerInteraction.Ignore)) floorY = floorHit.point.y;
+            const float step = .1f;
+            int n = Mathf.CeilToInt(radius / step);
+            var top = new float[2 * n + 1, 2 * n + 1];
+            for (int i = -n; i <= n; i++)
+                for (int j = -n; j <= n; j++)
+                {
+                    float best = float.NegativeInfinity;
+                    var o = new Vector3(spot.x + i * step, floorY + 2.2f, spot.z + j * step);
+                    foreach (var hit in Physics.RaycastAll(o, Vector3.down, 3f, ~0, QueryTriggerInteraction.Ignore))
+                        if (hit.collider.GetComponentInParent<CharacterController>() == null) best = Mathf.Max(best, hit.point.y);
+                    top[i + n, j + n] = best - floorY;
+                }
+            float H(int i, int j) => i < -n || i > n || j < -n || j > n ? float.NegativeInfinity : top[i + n, j + n];
+            var dirs = new[] { (1, 0), (-1, 0), (0, 1), (0, -1) };
+            float bestDistance = float.MaxValue; bool found = false;
+            for (int i = -n; i <= n; i++)
+                for (int j = -n; j <= n; j++)
+                {
+                    float h = H(i, j);
+                    if (h < .3f || h > .7f) continue;
+                    foreach (var (di, dj) in dirs)
+                    {
+                        // Backrest within 0.6 m behind, clearly higher than the cushion.
+                        int back = 0;
+                        for (int k = 1; k <= 6 && back == 0; k++) if (H(i + di * k, j + dj * k) > h + .35f && H(i + di * k, j + dj * k) < h + 1.1f) back = k;
+                        if (back == 0) continue;
+                        // The same cushion 0.4 m to both sides and for 0.5 m in front: the middle of a seat, not an armrest
+                        // (an armrest top is as high as a cushion, but has no seat depth in front of it).
+                        bool flat = true;
+                        foreach (int side in new[] { -4, 4 }) flat &= Mathf.Abs(H(i + dj * side, j + di * side) - h) < .04f;
+                        for (int k = 1; k <= 5 && flat; k++) flat &= Mathf.Abs(H(i - di * k, j - dj * k) - h) < .04f;
+                        if (!flat) continue;
+                        float distance = new Vector2(i, j).magnitude;
+                        if (distance >= bestDistance) continue;
+                        bestDistance = distance; found = true;
+                        facing = new Vector3(-di, 0, -dj);
+                        // Hips about 0.28 m in front of the backrest's face (it starts half a cell before cell 'back').
+                        seatTop = new Vector3(spot.x + i * step, floorY + h, spot.z + j * step) + facing * (.28f - (back - .5f) * step);
+                    }
+                }
+            return found;
         }
 
         // ---------------------------------------------------------------- the lounge window

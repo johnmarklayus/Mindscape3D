@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using Mindscape.AcademicPressure;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.FamilyExpectations
 {
@@ -47,25 +48,25 @@ namespace Mindscape.FamilyExpectations
             if (routeMarkers != null) routeMarkers.SetActive(false);
             if (bus != null) bus.gameObject.SetActive(false);
 
-            AddSpot(alarmClock, "Turn off the alarm", () => !alarmOff, SilenceAlarm);
+            AddSpot(alarmClock, W("Turn off the alarm"), () => !alarmOff, SilenceAlarm);
             for (int i = 0; i < items.Length; i++)
             {
                 int index = i;
-                AddSpot(items[i], "Take your " + Names[i].ToLowerInvariant().Replace("id", "ID"), () => alarmOff && !Packed(index), () => Collect(index));
+                AddSpot(items[i], W("Take your ") + Names[i].ToLowerInvariant().Replace("id", "ID"), () => alarmOff && !Packed(index), () => Collect(index));
             }
             // The front door opens with its own [ E ]; stepping out onto the path is what leaves the house.
-            AddArrival(Waypoint("Outside the front door", outsideSpawn), "Leave for school", () => AllPacked && !left, LeaveHouse);
-            AddSpot(busStop, "Wait at the bus stop", () => left && !atStop, WaitAtStop, 4.5f);
-            AddSpot(boardingPoint, "Board the bus", () => atStop && !boarded, Board, 4.5f);
+            AddArrival(Waypoint("Outside the front door", outsideSpawn), W("Leave for school"), () => AllPacked && !left, LeaveHouse);
+            AddSpot(busStop, W("Wait at the bus stop"), () => left && !atStop, WaitAtStop, 4.5f);
+            AddSpot(boardingPoint, W("Board the bus"), () => atStop && !boarded, Board, 4.5f);
 
             // Still asleep in bed when the alarm goes off (Joey's bed model shows the character under the blanket).
             bool lying = LieInBed(out _, out _);
             Shot(alarmClock.position + new Vector3(-2.8f, 2.2f, 2.4f), alarmClock.position);
             effects.clip = alarm; effects.loop = true; effects.volume = .14f; effects.Play();
-            yield return Card(TitleCard, "Begin  [Space]");
+            yield return Card(TitleCard, W("Begin  [Space]"));
             yield return DialogueSequence(
-                Say("Examination morning", "An alarm cuts through the quiet."),
-                Me("Wait... what time is it?\nOh no. I'm going to be late for the examination!"));
+                Say(W("Examination morning"), W("An alarm cuts through the quiet.")),
+                Me(W("Wait... what time is it?\nOh no. I'm going to be late for the examination!")));
             AddStress(15);
             if (lying)
             {
@@ -75,21 +76,21 @@ namespace Mindscape.FamilyExpectations
                 yield return Fade(1, 0, .35f);
             }
 
-            SetObjective("Turn off the alarm", Check(false, "Alarm clock beside the bed  ·  07:50"));
+            SetObjective(W("Turn off the alarm"), Check(false, W("Alarm clock beside the bed  ·  07:50")));
             yield return RoamUntil(() => alarmOff);
             yield return RoamUntil(() =>
             {
-                SetObjective(AllPacked ? "Leave through the front door" : "Find your examination things", Preparation());
+                SetObjective(AllPacked ? W("Leave through the front door") : W("Find your examination things"), Preparation());
                 return left;
             });
-            SetObjective("Walk to the bus stop", Check(true, "Packed") + Check(false, "Follow the blue markers"));
+            SetObjective(W("Walk to the bus stop"), Check(true, W("Packed")) + Check(false, W("Follow the blue markers")));
             yield return RoamUntil(() => atStop);
-            SetObjective("Board the bus", Check(true, "Bus stop") + Check(false, "The open bus door"));
+            SetObjective(W("Board the bus"), Check(true, W("Bus stop")) + Check(false, W("The open bus door")));
             yield return RoamUntil(() => boarded);
 
-            Complete("Before the bell",
-                "You found your belongings and caught the bus.\nBecause of the delay, you reached school after the examination had begun." +
-                (late ? "\n\nGetting ready took longer than planned, and you kept going anyway." : ""));
+            Complete(W("Before the bell"),
+                W("You found your belongings and caught the bus.\nBecause of the delay, you reached school after the examination had begun.") +
+                (late ? W("\n\nGetting ready took longer than planned, and you kept going anyway.") : ""));
         }
 
         // The getting-ready clock runs only while you are searching. Running out of it is allowed: it only means
@@ -108,7 +109,7 @@ namespace Mindscape.FamilyExpectations
             string clock = late ? "<color=#E89678>Running late  ·  keep going</color>\n" : "<color=#DBB36F>" + (s / 60).ToString("00") + ":" + (s % 60).ToString("00") + "  to get ready</color>\n";
             string list = clock;
             for (int i = 0; i < 3; i++) list += Check(Packed(i), Names[i] + (Packed(i) ? "" : "  ·  " + Places[i]));
-            if (AllPacked) list += Check(false, "Front door, through the living room");
+            if (AllPacked) list += Check(false, W("Front door, through the living room"));
             return list;
         }
 
@@ -116,7 +117,7 @@ namespace Mindscape.FamilyExpectations
         {
             effects.Stop(); effects.loop = false;
             ShotOver(alarmClock, 1.6f, 1.2f);
-            yield return Think("My ID, my examination materials, and my bag. Where did I put everything?");
+            yield return Think(W("My ID, my examination materials, and my bag. Where did I put everything?"));
             alarmOff = true;
         }
 
@@ -127,7 +128,7 @@ namespace Mindscape.FamilyExpectations
             effects.PlayOneShot(chime, .12f);
             packed |= 1 << i;
             int count = (packed & 1) + ((packed >> 1) & 1) + ((packed >> 2) & 1);
-            yield return Think(AllPacked ? "Everything is packed. I need to leave now." : Names[i] + ". " + count + " of 3 ready.");
+            yield return Think(AllPacked ? W("Everything is packed. I need to leave now.") : Names[i] + ". " + count + W(" of 3 ready."));
             items[i].gameObject.SetActive(false);
             if (i == 2) PlayerBackpack.Wear(player, true);
             if (AllPacked) EaseStress(5);
@@ -136,7 +137,7 @@ namespace Mindscape.FamilyExpectations
         IEnumerator LeaveHouse()
         {
             if (routeMarkers != null) routeMarkers.SetActive(true);
-            yield return Me(late ? "I'm later than I planned. But I have everything. I need to keep going." : "Okay, I have everything. I just need to get to school!");
+            yield return Me(late ? W("I'm later than I planned. But I have everything. I need to keep going.") : W("Okay, I have everything. I just need to get to school!"));
             left = true;
         }
 
@@ -145,20 +146,20 @@ namespace Mindscape.FamilyExpectations
             if (routeMarkers != null) routeMarkers.SetActive(false);
             Shot(busStop.position + new Vector3(-6, 3.5f, -6), busStop.position + Vector3.up);
             yield return DialogueSequence(
-                Think("No bus yet. The traffic is barely moving.", () =>
+                Think(W("No bus yet. The traffic is barely moving."), () =>
                 {
                     OpenPhoneLock("8:04", "");
-                    PhoneNotification("Calendar", "Examination", "The examination started at 08:00.");
+                    PhoneNotification(W("Calendar"), W("Examination"), W("The examination started at 08:00."));
                 }),
                 BeforeDialogue(new WaitForSeconds(.6f),
-                    Me("Please, not today. I have an examination.\nThe traffic isn't moving. I can't make the bus arrive sooner.")));
+                    Me(W("Please, not today. I have an examination.\nThe traffic isn't moving. I can't make the bus arrive sooner."))));
             ClosePhone();
             AddStress(15);
-            yield return Think("I can't make the bus arrive sooner. I can give myself one moment to breathe while I wait.");
+            yield return Think(W("I can't make the bus arrive sooner. I can give myself one moment to breathe while I wait."));
             bool busBreathCompleted = false;
             yield return Breathe(done => busBreathCompleted = done);
             Record("family.bus_stop_breathing", busBreathCompleted ? "completed" : "closed_early");
-            yield return Think("The traffic is still slow. I can meet the next moment when it comes.");
+            yield return Think(W("The traffic is still slow. I can meet the next moment when it comes."));
 
             // The night before.
             float sunWas = sun != null ? sun.intensity : 1, lampWas = deskLamp != null ? deskLamp.intensity : 1;
@@ -167,11 +168,11 @@ namespace Mindscape.FamilyExpectations
             if (deskLamp != null) deskLamp.intensity = 4;
             player.gameObject.SetActive(false);
             Shot(studyView.position, studyView.position + studyView.forward * 3);
-            ShowFlashback("The night before");
+            ShowFlashback(W("The night before"));
             yield return Fade(1, 0, .5f);
             yield return DialogueSequence(
-                Say("The night before", "One more page. One more lesson.\nI thought studying longer would make me feel prepared."),
-                Say(PlayerName + "  /  remembering", "I should have slept earlier. I didn't realize how tired I would be this morning."));
+                Say(W("The night before"), W("One more page. One more lesson.\nI thought studying longer would make me feel prepared.")),
+                Say(PlayerName + W("  /  remembering"), W("I should have slept earlier. I didn't realize how tired I would be this morning.")));
             yield return Fade(0, 1, .5f);
             EndFlashback();
             if (sun != null) sun.intensity = sunWas;
@@ -189,7 +190,7 @@ namespace Mindscape.FamilyExpectations
                 bus.position = stopAt;
             }
             else yield return Fade(1, 0, .5f);
-            yield return Me("It's here. I can still make it. I just need to get there.");
+            yield return Me(W("It's here. I can still make it. I just need to get there."));
             EaseStress(8);
             atStop = true;
         }
@@ -201,7 +202,7 @@ namespace Mindscape.FamilyExpectations
             Vector3 at = bus != null ? bus.position : busStop.position;
             Shot(at + new Vector3(4, 6, -14), at + Vector3.up * 1.5f);
             yield return Fade(1, 0, .4f);
-            yield return Think("The examination has already started.\nWhen I arrive, I'll have to begin with the time I have left.");
+            yield return Think(W("The examination has already started.\nWhen I arrive, I'll have to begin with the time I have left."));
             if (bus != null)
                 for (float t = 0; t < 4; t += Time.deltaTime) { bus.position += Vector3.right * Time.deltaTime * (2 + t * 3); yield return null; }
             yield return Fade(0, 1, 1);

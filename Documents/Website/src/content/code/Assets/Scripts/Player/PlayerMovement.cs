@@ -13,6 +13,10 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(PlayerInputBindings))]
 public partial class PlayerMovement : MonoBehaviour
 {
+    [Header("Shared settings")]
+    [Tooltip("Movement, camera, zoom and crosshair values shared with other scenes (Assets/Settings/Player). When set, they replace the values below as the game starts: edit the asset, not this component.")]
+    public PlayerSettings settings;
+
     [Header("Movement")]
     public float moveSpeed = 5f;
     public float rotationSpeed = 12f;
@@ -92,6 +96,7 @@ public partial class PlayerMovement : MonoBehaviour
 
     void Awake()
     {
+        if (settings != null) settings.ApplyTo(this);
         _controller = GetComponent<CharacterController>();
         _input = GetComponent<PlayerInputBindings>();
         _hud = GetComponent<PlayerControls>();
@@ -147,6 +152,7 @@ public partial class PlayerMovement : MonoBehaviour
             return;
         }
 
+        HandleUnstuck();   // R: emergency move to clear floor (PlayerMovement.Unstuck.cs)
         HandleMovement();
     }
 

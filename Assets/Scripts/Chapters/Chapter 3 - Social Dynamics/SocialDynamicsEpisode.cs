@@ -4,6 +4,7 @@ using System.Linq;
 using Mindscape.AcademicPressure;
 using Mindscape.Data;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.SocialDynamics
 {
@@ -20,12 +21,14 @@ namespace Mindscape.SocialDynamics
         public override int Chapter => 3;
         public override int Episode => episodeNumber;
         protected override string CompletionKey => SocialDynamicsChapter.SaveKey(Episode);
-        protected override string NextScene => Episode < 8 ? SocialDynamicsChapter.Scene(Episode + 1) : "";
-        protected override string ContinueLabel => "Continue";
-        protected override bool HasFinale => Episode == 8;
+        // After Episode 8: Chapter 4 when one has been made in the editor (Mindscape › Story › New Chapter), else the finale.
+        static bool HasChapterFour => Mindscape.Data.StoryChapters.Get(4) != null;
+        protected override string NextScene => Episode < 8 ? SocialDynamicsChapter.Scene(Episode + 1) : Mindscape.Data.StoryChapters.FirstScene(4);
+        protected override string ContinueLabel => Episode == 8 && HasChapterFour ? "Begin Chapter 4" : "Continue";
+        protected override bool HasFinale => Episode == 8 && !HasChapterFour;
         protected override string FinaleHeading => "CHAPTER 3  /  SOCIAL DYNAMICS";
         protected override string FinaleBody => "Thank you for walking through these stories with us.";
-        protected override string CompletionNext => Episode == 8 ? "CHAPTER 3 COMPLETE · SOCIAL DYNAMICS" : "NEXT: " + SocialDynamicsChapter.Titles[Episode].ToUpperInvariant();
+        protected override string CompletionNext => Episode == 8 ? (HasChapterFour ? "CHAPTER 3 COMPLETE  ·  NEXT: " + Mindscape.Data.StoryChapters.Get(4).Badge : "CHAPTER 3 COMPLETE · SOCIAL DYNAMICS") : "NEXT: " + SocialDynamicsChapter.Titles[Episode].ToUpperInvariant();
         protected override string RoamHint => "Follow the gold markers. E interacts; Space continues; number keys choose.";
         public int SeenMask { get; private set; }
         public int Response { get; private set; } = -1;
@@ -46,7 +49,7 @@ namespace Mindscape.SocialDynamics
                 Teleport(ClearSpawn(), spawn.eulerAngles.y);
                 Shot(openingView.position, openingView.position + openingView.forward * 8);
             }
-            yield return Card("CHAPTER 3 · SOCIAL DYNAMICS\n<size=60%>Episode " + Episode.ToString("00") + " · " + SocialDynamicsChapter.Titles[Episode - 1] + "</size>");
+            yield return Card(W("CHAPTER 3 · SOCIAL DYNAMICS\n<size=60%>Episode ") + Episode.ToString("00") + " · " + SocialDynamicsChapter.Titles[Episode - 1] + W("</size>"));
             switch (Episode)
             {
                 case 1: yield return Invitation(); break;
@@ -59,8 +62,8 @@ namespace Mindscape.SocialDynamics
                 case 8: yield return Mirror(); break;
             }
             Complete(SocialDynamicsChapter.Titles[Episode - 1], Episode == 8
-                ? "It's you!\nDespite everything, it's still you!\n\nYou do not have to become someone else to deserve kindness, friendship, and the chance to keep growing."
-                : "You took another step through the evening. Your choices are saved.\n\nContinue when you are ready.");
+                ? W("It's you!\nDespite everything, it's still you!\n\nYou do not have to become someone else to deserve kindness, friendship, and the chance to keep growing.")
+                : W("You took another step through the evening. Your choices are saved.\n\nContinue when you are ready."));
         }
 
         IEnumerator Lines(params string[] lines)
@@ -151,27 +154,27 @@ namespace Mindscape.SocialDynamics
             // Sample of the new look: Justin's message glows blue instead of having a gold marker (the others keep theirs).
             if (points[0].GetComponentInChildren<InteractOutline>(true) == null) points[0].gameObject.AddComponent<InteractOutline>();
             for (int i = 0; i < 3; i++) { int n = i; AddSpot(points[n], labels[n], () => (SeenMask & (1 << n)) == 0, () => Inspect(n)); }
-            SetObjective("An invitation from an old friend", "Explore the phone, photograph, and desk in any order.");
+            SetObjective(W("An invitation from an old friend"), W("Explore the phone, photograph, and desk in any order."));
             yield return RoamUntil(() => SeenMask == 7);
             // Justin writes again, and the reply is sent from the phone.
-            OpenPhone("Justin");
+            OpenPhone(W("Justin"));
             effects.PlayOneShot(chime, .2f);
-            yield return PhoneMessage(false, "Don't forget to let me know! I really hope you can come.", wait: false);
-            yield return PhoneChoose(new[] { "Sure! I'll try to come.", "I'm not sure yet. I have a few things to think about." }, i => Response = i);
+            yield return PhoneMessage(false, W("Don't forget to let me know! I really hope you can come."), wait: false);
+            yield return PhoneChoose(new[] { W("Sure! I'll try to come."), W("I'm not sure yet. I have a few things to think about.") }, i => Response = i);
             Record("social.invitation", Response.ToString());
             if (Response == 0)
             {
-                yield return PhoneMessage(true, "Sure! I'll try to come. It's been a while.", wait: false);
-                yield return PhoneMessage(false, "Great! See you there!");
+                yield return PhoneMessage(true, W("Sure! I'll try to come. It's been a while."), wait: false);
+                yield return PhoneMessage(false, W("Great! See you there!"));
             }
             else
             {
-                yield return PhoneMessage(true, "I'm not sure yet, but I'll think about it.", wait: false);
-                yield return PhoneMessage(false, "No pressure! Just let me know. We'd be happy to see you.");
-                yield return PhoneMessage(true, "I've thought about it. I'd like to come.");
+                yield return PhoneMessage(true, W("I'm not sure yet, but I'll think about it."), wait: false);
+                yield return PhoneMessage(false, W("No pressure! Just let me know. We'd be happy to see you."));
+                yield return PhoneMessage(true, W("I've thought about it. I'd like to come."));
             }
             ClosePhone();
-            yield return Think("I want to go. I really do. I just hope I don't spend the whole time worrying about what everyone thinks of me.");
+            yield return Think(W("I want to go. I really do. I just hope I don't spend the whole time worrying about what everyone thinks of me."));
             // Getting ready and the bus to the reunion (SocialJourney.cs).
             yield return GetReadyAndGo();
             IEnumerator Inspect(int n)
@@ -180,26 +183,26 @@ namespace Mindscape.SocialDynamics
                 if (n == 0)
                 {
                     // The invitation itself, as a text from Justin.
-                    OpenPhone("Justin");
-                    yield return PhoneMessage(false, "Hey! Our old group is planning a reunion this weekend. Are you coming? It would be nice to see everyone again!");
+                    OpenPhone(W("Justin"));
+                    yield return PhoneMessage(false, W("Hey! Our old group is planning a reunion this weekend. Are you coming? It would be nice to see everyone again!"));
                     ClosePhone();   // the phone fills the screen, so the thought comes once it is put down
-                    yield return Think("It's been a long time since I last saw everyone.");
+                    yield return Think(W("It's been a long time since I last saw everyone."));
                 }
                 else if (n == 1)
                 {
-                    ShowPhoto(Resources.Load<Texture2D>("SocialDynamics/OldGroupPhoto"), "the five of us, after class");
+                    ShowPhoto(Resources.Load<Texture2D>("SocialDynamics/OldGroupPhoto"), W("the five of us, after class"));
                     yield return Lines("I miss those days. We used to laugh about the smallest things. Nobody cared that much about what we had or what we were going to become.", "But things are different now. Everyone has their own life. I wonder what they'll think when they see me again.");
                     HidePhoto();
                 }
                 else yield return Lines("What if they ask about my achievements? What if they ask about my plans? What if I don't have anything interesting to say?");
                 SeenMask |= 1 << n;
-                SetObjective("An invitation from an old friend", Check((SeenMask & 1) != 0, labels[0]) + Check((SeenMask & 2) != 0, labels[1]) + Check((SeenMask & 4) != 0, labels[2]));
+                SetObjective(W("An invitation from an old friend"), Check((SeenMask & 1) != 0, labels[0]) + Check((SeenMask & 2) != 0, labels[1]) + Check((SeenMask & 4) != 0, labels[2]));
             }
         }
         IEnumerator Arrival()
         {
             yield return ArriveByBus();
-            yield return Think("There they are.");
+            yield return Think(W("There they are."));
             yield return Visit(0, "A familiar face", "Greet Justin", "Justin|Hey! You made it! It's been so long! How have you been?", "Me|I'm okay. How about you?", "Justin|I'm doing pretty well. A lot has happened since we last saw each other.", "Justin|Come on. Everyone's here. You should say hi!");
             // The old friends gather round, facing in, so every line can be seen from the front.
             GatherAround(points[1]);
@@ -207,17 +210,17 @@ namespace Mindscape.SocialDynamics
         }
         IEnumerator Conversations()
         {
-            for (int i = 0; i < 2; i++) { int n = i; AddSpot(points[n + 2], n == 0 ? "Listen to the career conversation" : "Listen to the travel conversation", () => (SeenMask & (1 << n)) == 0, () => Listen(n)); }
-            SetObjective("Everyone seems to be moving forward", "Listen to both groups in any order.");
+            for (int i = 0; i < 2; i++) { int n = i; AddSpot(points[n + 2], n == 0 ? W("Listen to the career conversation") : W("Listen to the travel conversation"), () => (SeenMask & (1 << n)) == 0, () => Listen(n)); }
+            SetObjective(W("Everyone seems to be moving forward"), W("Listen to both groups in any order."));
             yield return RoamUntil(() => SeenMask == 3);
             yield return Lines("They have plans. They have stories. They have things they're proud of.", "What am I supposed to say when it's my turn?");
-            yield return Think("The room feels loud. I can take a breath before I speak to anyone.");
+            yield return Think(W("The room feels loud. I can take a breath before I speak to anyone."));
             bool conversationBreathCompleted = false;
             yield return Breathe(done => conversationBreathCompleted = done);
             Record("social.conversation_breathing", conversationBreathCompleted ? "completed" : "closed_early");
-            yield return Think("I don't need a perfect story to talk to a friend.");
+            yield return Think(W("I don't need a perfect story to talk to a friend."));
             yield return Visit(0, "A check-in", "Talk with Justin", "Justin|Hey, are you enjoying yourself?", "Me|Yeah. It's nice seeing everyone again.", "Justin|That's good! I was hoping you'd have fun tonight. You've been pretty quiet, though. Is everything okay?");
-            yield return Choose("How do you respond?", "You can share as much as you want.", new[] { "I'm just listening. Everyone has a lot of interesting stories.", "I feel like everyone has moved forward, and I'm not sure where I fit anymore." }, i => Response = i);
+            yield return Choose(W("How do you respond?"), W("You can share as much as you want."), new[] { W("I'm just listening. Everyone has a lot of interesting stories."), W("I feel like everyone has moved forward, and I'm not sure where I fit anymore.") }, i => Response = i);
             Record("social.check_in", Response.ToString());
             if (Response == 0) yield return Lines("Justin|That's okay. You don't have to talk all the time. Just enjoy being here.", "Me|Yeah. I'll try.");
             else yield return Lines("Justin|Hey, you don't have to compare your life with theirs. Everyone's been going through different things.", "Me|I know, but it's hard not to think about it.", "Justin|I understand. We can talk more later, okay? You don't have to explain everything right now.");
@@ -227,47 +230,119 @@ namespace Mindscape.SocialDynamics
                 if (n == 0) yield return Lines("Friend 1|I've been preparing my portfolio because I want to apply for a better opportunity.", "Friend 2|That's a good idea. I've been doing the same thing. I feel like we have to prepare early if we want to get somewhere.");
                 else yield return Lines("Friend 3|I finally got to visit the place I've always wanted to see.", "Friend 4|That's amazing! I hope I can do that someday, too.");
                 SeenMask |= 1 << n;
-                SetObjective("Everyone seems to be moving forward", Check((SeenMask & 1) != 0, "Career conversation") + Check((SeenMask & 2) != 0, "Travel conversation"));
+                SetObjective(W("Everyone seems to be moving forward"), Check((SeenMask & 1) != 0, W("Career conversation")) + Check((SeenMask & 2) != 0, W("Travel conversation")));
             }
         }
         IEnumerator Corner()
         {
-            yield return Visit(4, "A little space", "Sit by the window", "Maybe I shouldn't have come.", "I thought seeing everyone again would make me happy. Instead, I keep thinking about everything I haven't done.");
-            yield return Glide(points[4].position + new Vector3(2, 2, -3), player.position + Vector3.up * 2, 2);
+            // Joey sits down on the lounge sofa nearest the window (the hall's seat, found by its shape: SocialStaging.CornerSeat)
+            // and stays seated while he checks his phone. With no seat found, the corner plays standing, as before.
+            bool seated = CornerSeatPose(out var seatTop, out var seatFacing);
+            yield return Visit(4, "A little space", "Sit by the window", () => { if (seated) SitInCorner(seatTop, seatFacing); }, null, "Maybe I shouldn't have come.", "I thought seeing everyone again would make me happy. Instead, I keep thinking about everything I haven't done.");
+            if (seated) { var (at, look) = CornerShot(1, seatTop, seatFacing); yield return MarkedGlide(CornerCameras[1], at, look, 2); }
+            else yield return Glide(points[4].position + new Vector3(2, 2, -3), player.position + Vector3.up * 2, 2);
             yield return Lines("I don't even think anyone has said anything bad about me. They're just talking about their lives.", "So why does it feel like I'm being left behind?", "Maybe I don't belong here anymore.");
-            yield return Visit(5, "A quiet moment", "Check your phone", () => OpenPhoneLock("8:17", "Saturday", dim: true), ClosePhone, "There are no new messages. My reflection is faint on the dark screen.", "Everyone else seems to know who they're becoming.", "I don't even know how to explain who I am right now.");
-            yield return Say("Narration", "You turn off the phone. The music inside keeps going. Maybe some fresh air would help.");
+            string[] phoneLines = { "There are no new messages. My reflection is faint on the dark screen.", "Everyone else seems to know who they're becoming.", "I don't even know how to explain who I am right now." };
+            if (seated)
+            {
+                // Still on the sofa: the phone comes out where he sits (no walking over to the corner spot).
+                SetObjective(W("A quiet moment"), Check(false, W("Check your phone")));
+                var (phoneAt, phoneLook) = CornerShot(2, seatTop, seatFacing);
+                MarkedShot(CornerCameras[2], phoneAt, phoneLook);
+                OpenPhoneLock("8:17", "Saturday", dim: true);
+                yield return Lines(phoneLines);
+                ClosePhone();
+                Stage++;
+            }
+            else yield return Visit(5, "A quiet moment", "Check your phone", () => OpenPhoneLock("8:17", "Saturday", dim: true), ClosePhone, phoneLines);
+            yield return Say(W("Narration"), W("You turn off the phone. The music inside keeps going. Maybe some fresh air would help."));
         }
+        // ---------------------------------------------------------------- Episode 4: the seat by the window
+        // Built in, the seat is the lounge sofa nearest the window (SocialStaging.CornerSeat) and the shots are framed
+        // from it. StoryMarkers take them over: "Corner/Seat" (position = top of the cushion, arrow = the way Joey faces)
+        // and the three cameras below.
+        const string CornerSeatMarker = "Corner/Seat";
+        static readonly string[] CornerCameras = { "Corner/Seat camera", "Corner/Thinking camera", "Corner/Phone camera" };
+
+        bool CornerSeatPose(out Vector3 seatTop, out Vector3 facing)
+        {
+            var m = Marker(CornerSeatMarker);
+            if (m != null)
+            {
+                seatTop = m.transform.position;
+                facing = Vector3.ProjectOnPlane(m.transform.forward, Vector3.up).normalized;
+                return true;
+            }
+            return SocialStaging.CornerSeat(points[4].position, out seatTop, out facing);
+        }
+
+        // The built-in shots: 0 sitting down, 1 the thoughts (a slow glide), 2 the phone. All from in front, off to the side
+        // away from the window (looking back toward it), so the pose and the window are both in view.
+        (Vector3 at, Vector3 look) CornerShot(int i, Vector3 seatTop, Vector3 facing)
+        {
+            Vector3 side = Vector3.Cross(Vector3.up, facing);
+            if (Vector3.Dot(side, points[4].position - seatTop) > 0) side = -side;
+            switch (i)
+            {
+                case 0: return (seatTop + facing * 2.2f + side * 1.6f + Vector3.up * 1.5f, seatTop + Vector3.up * .5f);
+                case 1: return (seatTop + facing * 1.9f + side * 2.1f + Vector3.up * 1.3f, seatTop + Vector3.up * .5f);
+                default: return (seatTop + facing * 1.7f + side * 1.1f + Vector3.up * 1.3f, seatTop + Vector3.up * .55f);
+            }
+        }
+
+        void SitInCorner(Vector3 seatTop, Vector3 facing)
+        {
+            SitAt(seatTop, Quaternion.LookRotation(facing).eulerAngles.y);
+            var (at, look) = CornerShot(0, seatTop, facing);
+            MarkedShot(CornerCameras[0], at, look);
+        }
+
+        public override System.Collections.Generic.IEnumerable<StoryMarkerDefault> MarkerDefaults()
+        {
+            if (Episode == 4 && points.Length > 4 && points[4] != null && SocialStaging.CornerSeat(points[4].position, out var seatTop, out var facing))
+            {
+                yield return new StoryMarkerDefault(CornerSeatMarker, StoryMarkerKind.Seat, seatTop, facing, "Where Joey sits by the window: the top of the cushion; the arrow is the way Joey faces.");
+                string[] notes = { "The shot as Joey sits down.", "The slow glide during Joey's thoughts.", "The shot while Joey checks the phone." };
+                for (int i = 0; i < CornerCameras.Length; i++)
+                {
+                    var (at, look) = CornerShot(i, seatTop, facing);
+                    yield return new StoryMarkerDefault(CornerCameras[i], StoryMarkerKind.Camera, at, look - at, notes[i]);
+                }
+            }
+            if (Episode == 7 && points.Length > 3 && points[2] != null)
+                foreach (var d in HomeMarkerDefaults()) yield return d;
+        }
+
         IEnumerator CheckIn()
         {
             // Joey steps out through the hall doors to the little park outside, and Justin comes to find him there
             // (SocialJourney.cs).
             bool talked = false;
             HallDoors(out var doors, out _, out _);
-            yield return Think("It's so loud in here. I need some air.");
-            AddArrival(Waypoint("By the hall doors", doors), "Step outside for some air", () => !talked, () => Talked(ParkTalk(), () => talked = true), 2.4f);
-            SetObjective("A friend checks in", Check(false, "Step outside through the hall doors"));
+            yield return Think(W("It's so loud in here. I need some air."));
+            AddArrival(Waypoint("By the hall doors", doors), W("Step outside for some air"), () => !talked, () => Talked(ParkTalk(), () => talked = true), 2.4f);
+            SetObjective(W("A friend checks in"), Check(false, W("Step outside through the hall doors")));
             yield return RoamUntil(() => talked);
         }
         static IEnumerator Talked(IEnumerator scene, Action done) { yield return scene; done(); }
         IEnumerator Rejoin()
         {
             yield return Lines("I'm still worried about what people might think of me.", "But maybe I don't have to wait until my life is perfect before I can enjoy being with them.");
-            yield return Think("I can pause here, then go back in as I am.");
+            yield return Think(W("I can pause here, then go back in as I am."));
             bool rejoinBreathCompleted = false;
             yield return Breathe(done => rejoinBreathCompleted = done);
             Record("social.rejoin_breathing", rejoinBreathCompleted ? "completed" : "closed_early");
-            yield return Think("I can return to the group without proving anything.");
+            yield return Think(W("I can return to the group without proving anything."));
             // The friends were standing by the stage for the photograph; for this talk they gather round the table, so
             // the conversation's cuts stay at the table instead of crossing the hall. They go back while the journal card is up.
             var stageSpots = GatherAround(points[1]);
             yield return Visit(1, "There is room for you", "Rejoin the group", "Justin|Come sit here!", "Friend 1|There you are! We were just talking about our old school days.", "Friend 2|Do you remember that time we all got confused during the group activity?", "Me|Of course! I still remember how we kept arguing about what to do.", "Friend 1|And somehow, we still finished it!", "Me|Yeah. It wasn't perfect, but we got through it.", "Friend 3|So, what have you been up to lately?", "Me|I've been figuring things out. Some days are good, and some days are difficult. I'm still learning what I want to do next.", "Friend 3|Honestly, same. I think most of us are still figuring things out.", "Friend 2|Yeah. We don't have to have everything planned already.", "Me|That actually makes me feel better.");
-            yield return Choose(SocialDynamicsChapter.JournalPrompt, "Choose one thing you appreciate about yourself.", SocialDynamicsChapter.Appreciations, i => Response = i);
+            yield return Choose(SocialDynamicsChapter.JournalPrompt, W("Choose one thing you appreciate about yourself."), SocialDynamicsChapter.Appreciations, i => Response = i);
             Record("social.appreciation", SocialDynamicsChapter.Appreciations[Response]);
             MindscapeDatabase.SaveJournal(3, 6, SocialDynamicsChapter.JournalPrompt, SocialDynamicsChapter.Appreciations[Response]);
             foreach (var (who, at, turn) in stageSpots) if (who != null) who.SetPositionAndRotation(at, turn);
-            yield return Card("Saved to your reflection journal\n\n" + SocialDynamicsChapter.Appreciations[Response]);
-            yield return Think("Maybe I don't have to be the most successful person in the room to have a place here.");
+            yield return Card(W("Saved to your reflection journal\n\n") + SocialDynamicsChapter.Appreciations[Response]);
+            yield return Think(W("Maybe I don't have to be the most successful person in the room to have a place here."));
             yield return Visit(6, "A memory together", "Join the group photograph", "Justin|Everyone, come on! Let's take a picture before somebody leaves!", "Friend 1|Come closer! There's still room!", "Justin|You're part of this, too. Come here!");
             yield return GroupPhoto();
         }

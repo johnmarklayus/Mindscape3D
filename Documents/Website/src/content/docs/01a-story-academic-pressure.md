@@ -10,7 +10,7 @@ The whole chapter happens around one school deadline: a research project due tom
 
 > [!TIP] How to build it
 >
-> `Mindscape > Chapter 1 - Academic Pressure > Build All Episodes` rebuilds the four scenes. Each episode also has its own build item. Save unrelated scene work first.
+> The four scenes are now edited by hand in Unity. `Mindscape > Legacy Builders > Chapter 1 - Academic Pressure > Build All Episodes` can still regenerate them, but it replaces every hand-made change in those scenes and asks first. See [Onboarding](/onboarding#scenes).
 
 ## The four episodes
 

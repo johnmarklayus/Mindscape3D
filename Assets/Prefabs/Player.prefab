@@ -75,14 +75,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerControls
   tasksOpen: 0
   pauseOpen: 0
+  dialogueOpen: 0
+  questOpen: 0
+  minigameOpen: 0
+  tasksAvailable: 1
   hudButtonColor: {r: 0.02, g: 0.1, b: 0.18, a: 0.92}
   stressLevel: 10
   stressMax: 100
   criticalStressDuration: 10
   hudRoot: {fileID: 0}
   pauseMenu: {fileID: 0}
-  stressFillImage: {fileID: 0}
-  stressLabelText: {fileID: 0}
   tasksButton: {fileID: 0}
   menuButton: {fileID: 0}
   tasksButtonBackground: {fileID: 0}
@@ -116,27 +118,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: 585e2e56fd5cf49159bf118b67f3e3c0, type: 2}
   moveSpeed: 5
   rotationSpeed: 12
   gravity: -20
   animator: {fileID: 6247961922258441098}
   runSpeed: 12
+  canRun: 1
   cameraTransform: {fileID: 0}
   cameraOffset: {x: 0, y: 0.45, z: -3.25}
   cameraFollowSpeed: 10
   mouseSensitivity: 0.25
+  keyLookSpeed: 120
+  touchLookSpeed: 150
+  scrollTurnSpeed: 0.5
+  scrollZoomSpeed: 0.02
   cameraTargetHeight: 2.1
   cameraShoulderOffset: 0.55
-  pitchMin: -12
-  pitchMax: 45
+  orbitPitchMin: -10
+  orbitPitchMax: 80
+  touchDragSpeed: 0.18
   cameraCollisionRadius: 0.25
   cameraCollisionPadding: 0.15
   cameraCollisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  cameraWallStopDistance: 1.5
   zoomSpeed: 5
   minDistance: 2.5
   maxDistance: 10
+  allowFirstPerson: 1
+  viewSwitchSpeed: 8
+  firstPersonEyeHeight: 0
   showCrosshair: 1
   crosshairSize: 5
   crosshairColor: {r: 1, g: 1, b: 1, a: 1}

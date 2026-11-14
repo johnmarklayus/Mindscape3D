@@ -11,7 +11,7 @@ public static class KeepsakeBaseball
     const string ScenePath = "Assets/Scenes/Chapter 2 - Episode 5.unity";
     const float Scale = 2.4f;   // the house is built at ~2.5x (desk tops at 1.86 m)
 
-    [MenuItem("Mindscape/Chapter 2 - Family Expectations/Episode 5 · Baseball Keepsake by the Wardrobe")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 2 - Family Expectations/Episode 5 · Baseball Keepsake by the Wardrobe")]
     public static void ApplyToScene()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }

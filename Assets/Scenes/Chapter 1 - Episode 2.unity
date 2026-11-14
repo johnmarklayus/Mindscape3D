@@ -8373,11 +8373,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: 45f3f8e7b06874b81a047d585c01c6d2, type: 2}
   moveSpeed: 7
   rotationSpeed: 12
   gravity: -20
   animator: {fileID: 861873935}
   runSpeed: 16.8
+  canRun: 1
   cameraTransform: {fileID: 958846689}
   cameraOffset: {x: 0, y: 0.63, z: -4.9}
   cameraFollowSpeed: 10
@@ -8396,6 +8398,7 @@ MonoBehaviour:
   cameraCollisionMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  cameraWallStopDistance: 1.5
   zoomSpeed: 5
   minDistance: 2.1
   maxDistance: 7

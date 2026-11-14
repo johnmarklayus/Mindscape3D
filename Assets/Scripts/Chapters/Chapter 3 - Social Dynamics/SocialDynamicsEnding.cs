@@ -4,6 +4,7 @@ using System.Linq;
 using Mindscape.AcademicPressure;
 using Mindscape.Data;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.SocialDynamics
 {
@@ -147,7 +148,7 @@ namespace Mindscape.SocialDynamics
             SocialStaging.SaveGroupPhoto(photo);
             if (groupPhoto != null) groupPhoto.SetActive(true);
             Record("social.group_photo", "taken");
-            ShowPhoto(photo, "all of us, tonight");
+            ShowPhoto(photo, W("all of us, tonight"));
             speakerShots = false;
             yield return Lines("Me|We should do this again sometime.", "Justin|Definitely.");
             speakerShots = true;
@@ -219,16 +220,16 @@ namespace Mindscape.SocialDynamics
             {
                 int n = i;
                 var point = Waypoint("Memory on the way home " + (n + 1), Ground(memoryAt[n], walkY));
-                Quiet(AddArrival(point, "Remember", () => (seen & (1 << n)) == 0, () => Remember(n), 3.2f));
+                Quiet(AddArrival(point, W("Remember"), () => (seen & (1 << n)) == 0, () => Remember(n), 3.2f));
             }
-            Quiet(AddArrival(Waypoint("Under the streetlights", Ground(lights, walkY)), "Follow the streetlights", () => !streetNoticed, StreetQuiet, 3.2f));
-            AddArrival(Waypoint("A place to stop", Ground(photoAt, walkY)), "Look at the group photograph", () => !photoSeen, LookAtPhoto, 3.4f);
-            SetObjective("The walk home", Check(false, "Follow the streetlights"));
+            Quiet(AddArrival(Waypoint("Under the streetlights", Ground(lights, walkY)), W("Follow the streetlights"), () => !streetNoticed, StreetQuiet, 3.2f));
+            AddArrival(Waypoint("A place to stop", Ground(photoAt, walkY)), W("Look at the group photograph"), () => !photoSeen, LookAtPhoto, 3.4f);
+            SetObjective(W("The walk home"), Check(false, W("Follow the streetlights")));
             yield return RoamUntil(() => photoSeen);
 
             // The front door opens with its own [ E ]; stepping inside is the welcome: the family is right there.
             bool home = false;
-            AddArrival(points[2], "Go inside", () => !home, () => Welcome(() => home = true));
+            AddArrival(points[2], W("Go inside"), () => !home, () => Welcome(() => home = true));
             yield return RoamUntil(() => home);
             yield return Visit(3, "Back in your room", "Place your phone on the desk", () => { if (deskItems != null) foreach (var item in deskItems) if (item != null) item.SetActive(true); }, null, "Today wasn't as bad as I thought it would be.");
             yield return FallAsleep();
@@ -236,8 +237,8 @@ namespace Mindscape.SocialDynamics
             IEnumerator Remember(int n)
             {
                 seen |= 1 << n;
-                yield return FlashbackIn("Earlier tonight  ·  the reunion", null, .35f);
-                ShowPhoto(Resources.Load<Texture2D>(memories[n].image), "earlier tonight");
+                yield return FlashbackIn(W("Earlier tonight  ·  the reunion"), null, .35f);
+                ShowPhoto(Resources.Load<Texture2D>(memories[n].image), W("earlier tonight"));
                 yield return Lines(memories[n].lines);
                 HidePhoto();
                 yield return FlashbackOut(null, .35f);
@@ -245,7 +246,7 @@ namespace Mindscape.SocialDynamics
             IEnumerator StreetQuiet()
             {
                 streetNoticed = true;
-                yield return Think("The street is quiet. I can still hear my friends laughing when I think about tonight.");
+                yield return Think(W("The street is quiet. I can still hear my friends laughing when I think about tonight."));
             }
             IEnumerator LookAtPhoto()
             {
@@ -254,11 +255,11 @@ namespace Mindscape.SocialDynamics
                 Vector3 forward = Flat(player.forward).normalized, right = Vector3.Cross(Vector3.up, forward);
                 float h = PlayerHeight();
                 yield return Glide(player.position - forward * 1.5f + right * .8f + Vector3.up * h * .95f, player.position + forward * 1.4f + Vector3.up * h * .55f, 2.2f);
-                ShowPhoto(SocialStaging.Picture(SocialStaging.GroupPhotoKey), "the five of us, tonight");
+                ShowPhoto(SocialStaging.Picture(SocialStaging.GroupPhotoKey), W("the five of us, tonight"));
                 yield return Lines("I almost spent the whole evening hiding from everyone.", "I thought I had to become someone better before I could stand beside them.", "But they didn't ask me to prove anything. They just wanted me to be there.");
                 HidePhoto();
                 yield return Glide(player.position - forward * 4.5f + Vector3.up * h * 1.2f, player.position + forward * 3 + Vector3.up * h * .5f, 1.2f);
-                SetObjective("A warm welcome", Check(false, "Go home"));
+                SetObjective(W("A warm welcome"), Check(false, W("Go home")));
             }
         }
 
@@ -279,28 +280,60 @@ namespace Mindscape.SocialDynamics
         // ---------------------------------------------------------------- the welcome home
 
         Transform mom, dad, tim;
-        Vector3 houseIn = Vector3.back;
+        Vector3 houseIn = Vector3.back, houseEntry, familySide;
 
-        // Before you reach the house: the family waits just inside the front door, facing it.
+        // Before you reach the house: the family waits inside the front door, facing it, all on the side of the hall away
+        // from your room, so a clear lane runs from the door past them (standing across the hall, they blocked the way in).
+        // Each place can be moved in the scene with a StoryMarker ("Family/Mom", "Family/Dad", "Family/Tim").
         void StageFamily()
         {
             mom = Mindscape.AcademicPressure.HomeWelcome.FindPerson("Mom", "Mother");
             dad = Mindscape.AcademicPressure.HomeWelcome.FindPerson("Dad", "Father");
             tim = Mindscape.AcademicPressure.HomeWelcome.FindPerson("Tim");
-            Vector3 inside = points[3] != null ? points[3].position : points[2].position;
-            Mindscape.AcademicPressure.HomeWelcome.FrontDoor(inside, out var door, out houseIn);
-            float floorY = Ground(points[2].position, points[2].position.y - 1.4f).y;
-            Vector3 side = Vector3.Cross(Vector3.up, houseIn);
-            Vector3 entry = new Vector3(door.x, floorY, door.z);
-            void Put(Transform who, Vector3 offset)
+            float floorY = FamilyLayout(out houseEntry, out houseIn, out familySide);
+            var who = new[] { mom, dad, tim };
+            for (int i = 0; i < FamilySpots.Length; i++)
             {
-                if (who == null) return;
-                var at = Mindscape.AcademicPressure.HomeWelcome.ClearFloor(entry + offset, floorY);
-                Mindscape.AcademicPressure.HomeWelcome.Place(who, at, entry);
+                var (id, inward, side) = FamilySpots[i];
+                var at = Mindscape.AcademicPressure.HomeWelcome.ClearFloor(houseEntry + houseIn * inward + familySide * side, floorY);
+                PlaceMarked(id, who[i], at, houseEntry);
             }
-            Put(mom, houseIn * 4.6f + side * .4f);
-            Put(dad, houseIn * 5.2f - side * 1.5f);
-            Put(tim, houseIn * 4.2f + side * 2.0f);
+        }
+
+        // Where the family stands inside the front door (built in): how far in, how far to the side away from your room.
+        static readonly (string id, float inward, float side)[] FamilySpots = { ("Family/Mom", 4.6f, 1.6f), ("Family/Dad", 5.4f, 2.4f), ("Family/Tim", 4.0f, 3.0f) };
+        // Where Mom and Tim step to when you come in.
+        static readonly (string id, float inward, float side)[] WelcomeSteps = { ("Welcome/Mom step", 3.0f, 1.5f), ("Welcome/Tim step", 2.6f, 2.7f) };
+
+        // The front door: the floor height, the point in the doorway, the way into the house, and the side of the hall
+        // away from your room (where the family stands).
+        float FamilyLayout(out Vector3 entry, out Vector3 inward, out Vector3 side)
+        {
+            Vector3 inside = points[3] != null ? points[3].position : points[2].position;
+            Mindscape.AcademicPressure.HomeWelcome.FrontDoor(inside, out var door, out inward);
+            float floorY = Ground(points[2].position, points[2].position.y - 1.4f).y;
+            side = Vector3.Cross(Vector3.up, inward);
+            entry = new Vector3(door.x, floorY, door.z);
+            // Your room (where the phone goes on the desk) decides which side stays clear.
+            Vector3 room = points.Length > 3 && points[3] != null ? points[3].position : entry + inward * 6;
+            if (Vector3.Dot(room - entry, side) > 0) side = -side;
+            return floorY;
+        }
+
+        // Episode 7's markers at their built-in places (for the Inspector's "create missing markers").
+        System.Collections.Generic.IEnumerable<StoryMarkerDefault> HomeMarkerDefaults()
+        {
+            float floorY = FamilyLayout(out var entry, out var inward, out var side);
+            foreach (var (id, inn, sd) in FamilySpots)
+            {
+                var at = Mindscape.AcademicPressure.HomeWelcome.ClearFloor(entry + inward * inn + side * sd, floorY);
+                yield return new StoryMarkerDefault(id, StoryMarkerKind.Person, at, entry - at, "Where they wait for you inside the front door (Episode 7).");
+            }
+            foreach (var (id, inn, sd) in WelcomeSteps)
+            {
+                var at = entry + inward * inn + side * sd; at.y = floorY;
+                yield return new StoryMarkerDefault(id, StoryMarkerKind.Person, at, entry - at, "Where they step to when you come in (Episode 7).");
+            }
         }
 
         IEnumerator Welcome(System.Action done)
@@ -317,8 +350,10 @@ namespace Mindscape.SocialDynamics
             Shot(Mindscape.AcademicPressure.HomeWelcome.ClearView(middle, middle + side * 4.6f + Vector3.up * 1.1f - houseIn * .6f), middle);
             ShotFocus.Clear();
             foreach (var f in family) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.TurnTo(f, player.position));
-            if (mom != null) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.StepToward(mom, player.position + houseIn * 1.9f + side * .3f, 1.1f));
-            if (tim != null) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.StepToward(tim, player.position + houseIn * 1.7f + side * 1.6f, 1.0f));
+            // Mom and Tim come a little closer, but stay off to their side of the hall so the way in stays open.
+            Vector3 Step(int i) => Marked(WelcomeSteps[i].id, houseEntry + houseIn * WelcomeSteps[i].inward + familySide * WelcomeSteps[i].side);
+            if (mom != null) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.StepToward(mom, Step(0), 1.1f));
+            if (tim != null) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.StepToward(tim, Step(1), 1.0f));
             yield return new WaitForSeconds(1.2f);
             foreach (var f in family) StartCoroutine(Mindscape.AcademicPressure.HomeWelcome.TurnTo(f, player.position, .3f));
             yield return DialogueSequence(
@@ -327,13 +362,13 @@ namespace Mindscape.SocialDynamics
                 FamilyLine(dad, "Dad", "That's good! Did you have fun?"),
                 FamilyLine(null, null, "Yeah, I did. It was nice catching up with them."),
                 FamilyLine(mom, "Mom", "That's great. You should get some rest now. You must be tired."),
-                BeforeDialogue(null, Think("It's nice to be home.")),
+                BeforeDialogue(null, Think(W("It's nice to be home."))),
                 FamilyLine(tim, "Tim", "Good night! Don't stay up too late!"),
                 FamilyLine(null, null, "Good night!"));
             foreach (var f in family) Mindscape.AcademicPressure.HomeWelcome.Play(f, "Idle");
             // Back to walking, with the camera behind you inside the house, on to your room.
             Teleport(player.position, yawIn);
-            SetObjective("Back in your room", Check(false, "Place your phone on the desk"));
+            SetObjective(W("Back in your room"), Check(false, W("Place your phone on the desk")));
             done();
 
             IEnumerator FamilyLine(Transform who, string name, string words)
@@ -383,7 +418,7 @@ namespace Mindscape.SocialDynamics
             yield return Fade(0, 1, 3f);
             SetFadeColor(new Color(.05f, .07f, .14f));
             yield return Fade(1, .6f, 1.5f);
-            yield return Say("Narration", PlayerName + " falls asleep, still smiling. Somewhere in a dream, a soft light is waiting.");
+            yield return Say(W("Narration"), PlayerName + W(" falls asleep, still smiling. Somewhere in a dream, a soft light is waiting."));
             yield return Fade(.6f, 1, 1f);
             SetFadeColor(null);
             yield return Fade(1, 0, .1f);
@@ -434,13 +469,13 @@ namespace Mindscape.SocialDynamics
 
         IEnumerator Dream()
         {
-            yield return Think("I open my eyes. Everything is dim... but not completely dark.");
-            yield return Think("There's a light, far ahead.");
+            yield return Think(W("I open my eyes. Everything is dim... but not completely dark."));
+            yield return Think(W("There's a light, far ahead."));
             bool reached = false;
             StartCoroutine(Watch());
-            SetObjective("A light in the distance", Check(false, "Walk toward the light"));
+            SetObjective(W("A light in the distance"), Check(false, W("Walk toward the light")));
             yield return RoamUntil(() => reached);
-            yield return Think("The light is so warm.");
+            yield return Think(W("The light is so warm."));
             // The light fills the view, and he wakes in his own room.
             SetFadeColor(new Color(1, .98f, .93f));
             yield return Fade(0, 1, 2.4f);
@@ -472,7 +507,7 @@ namespace Mindscape.SocialDynamics
             }
             yield return Fade(1, 0, 2f);
             SetFadeColor(null);
-            yield return Think("My room. It was a dream... but I still remember every one of those moments.");
+            yield return Think(W("My room. It was a dream... but I still remember every one of those moments."));
 
             IEnumerator Watch()
             {
@@ -503,9 +538,9 @@ namespace Mindscape.SocialDynamics
             Vector3 floor = new Vector3(mirrorSpot.position.x, spawn.position.y, mirrorSpot.position.z);
             bool near = false, facing = false;
             // On the way up to it, he starts to see himself.
-            Quiet(AddArrival(Waypoint("Approaching the mirror", floor + toRoom * 2.8f), "Approach the mirror", () => !near, Near, 1.3f));
-            AddArrival(Waypoint("In front of the mirror", floor + toRoom * 1.3f), "Look into the mirror", () => near && !facing, () => { facing = true; return Nothing(); }, 1.1f);
-            SetObjective("The person standing here", Check(false, "Walk up to the mirror"));
+            Quiet(AddArrival(Waypoint("Approaching the mirror", floor + toRoom * 2.8f), W("Approach the mirror"), () => !near, Near, 1.3f));
+            AddArrival(Waypoint("In front of the mirror", floor + toRoom * 1.3f), W("Look into the mirror"), () => near && !facing, () => { facing = true; return Nothing(); }, 1.1f);
+            SetObjective(W("The person standing here"), Check(false, W("Walk up to the mirror")));
             yield return RoamUntil(() => facing);
 
             // Face the mirror squarely. Younger Joey stands beside you, seen only in the reflection.
@@ -559,8 +594,8 @@ namespace Mindscape.SocialDynamics
             if (warmth != null) warmth.intensity *= 1.5f;
             if (mirror != null) mirror.Glow = 1.15f;
             yield return BlendYounger(mirror, 1, 1.6f);
-            yield return Card("IT'S YOU!");
-            yield return Card("Despite everything, it's still you!");
+            yield return Card(W("IT'S YOU!"));
+            yield return Card(W("Despite everything, it's still you!"));
             yield return Lines("I'm still the person who was afraid to enter that room. I'm still the person who compared my life with everyone else's. I don't know exactly what will happen next.", "But I'm also the person who showed up, who tried, and who chose to keep going.", "I don't have to prove that my life is better than someone else's. I can keep learning without rejecting who I am today.", "Maybe I don't have everything figured out yet. And maybe, for now, that's enough.");
 
             // The two of them in the glass; the camera pulls slowly back into the dark.
@@ -583,7 +618,7 @@ namespace Mindscape.SocialDynamics
             storyCamera.cullingMask = 0;
             var background = storyCamera.backgroundColor; storyCamera.backgroundColor = Color.black;
             yield return Fade(1, 0, .6f);
-            yield return Card("THE END");
+            yield return Card(W("THE END"));
             storyCamera.cullingMask = mask; storyCamera.backgroundColor = background;
             if (younger != null) Destroy(younger);
             foreach (var f in frames) if (f != null) f.Hide(.1f);
@@ -592,7 +627,7 @@ namespace Mindscape.SocialDynamics
             IEnumerator Near()
             {
                 near = true;
-                yield return Think("That's me.");
+                yield return Think(W("That's me."));
             }
             IEnumerator Step(int n)
             {

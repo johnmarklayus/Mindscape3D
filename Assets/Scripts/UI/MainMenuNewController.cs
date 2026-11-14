@@ -69,6 +69,7 @@ public class MainMenuNewController : MonoBehaviour
             // The home title's soft dark glow is the same animated picture, blurred and darkened (.logo-glow).
             if (titleModel.Ready) foreach (var glow in root.Query(className: "logo-glow").ToList()) glow.style.backgroundImage = Background.FromRenderTexture(titleModel.Texture);
         }
+        AddStoryChapters();
         foreach (var page in stage.Children()) if (page.name.StartsWith("page-")) pages[page.name.Substring(5)] = page;
         foreach (var key in pages.Keys) { string page = key; On("back-" + page, () => ShowPage(page.StartsWith("episodes") ? "chapters" : "home")); }
         BindLogin(); BindHome(); BindChapters(); BindEpisodes(); BindJournal(); BindOptions(); BindGuide(); BindResources(); BindQuit();
@@ -678,7 +679,7 @@ public class MainMenuNewController : MonoBehaviour
     }
     void BindChapters()
     {
-        for (int i = 1; i <= 3; i++)
+        for (int i = 1; i <= MindscapeProgress.ChapterCount; i++)
         {
             int chapter = i;
             var card = root.Q<Button>("chapter-" + chapter);
@@ -692,6 +693,82 @@ public class MainMenuNewController : MonoBehaviour
         }
         progressCaption = root.Q<Label>("progress-caption");
         progressFill = root.Q("progress-fill");
+    }
+
+    // ---------------------------------------------------------------- chapters made in the editor
+    // Chapter 4 and later are StoryChapter assets (Mindscape › Story › New Chapter…). Each gets a card on the chapter
+    // page and an episode page, built here with the same classes as Chapter 3's in MainMenuNew.uxml, so they look alike.
+    void AddStoryChapters()
+    {
+        var row = root.Q("page-chapters")?.Q(className: "chapter-row");
+        var template = root.Q("page-episodes-3");
+        if (row == null || template == null || template.parent == null) return;
+        Label Words(string text, string className, string name = null)
+        {
+            var label = new Label(text ?? "");
+            if (name != null) label.name = name;
+            label.AddToClassList(className);
+            return label;
+        }
+        VisualElement Flourish() { var art = new MenuLineArt("sprig", false); art.AddToClassList("flourish"); return art; }
+        VisualElement after = template;   // the pages go after Chapter 3's, in chapter order
+        foreach (var c in StoryChapters.Playable)
+        {
+            int n = c.number;
+            row.Q("chapter-" + n)?.RemoveFromHierarchy();
+            template.parent.Q("page-episodes-" + n)?.RemoveFromHierarchy();
+
+            var card = new Button { name = "chapter-" + n };
+            card.AddToClassList("chapter-card");
+            var art = new VisualElement();
+            art.AddToClassList("chapter-art");
+            if (c.thumbnail != null) art.style.backgroundImage = c.thumbnail;
+            card.Add(art);
+            card.Add(Words("CHAPTER " + n, "chapter-heading"));
+            card.Add(Words(c.title, "chapter-sub"));
+            card.Add(Words("LOCKED  ·  finish Chapter " + (n - 1), "chapter-bottom", "chapter-" + n + "-state"));
+            row.Add(card);
+
+            var page = new VisualElement { name = "page-episodes-" + n };
+            page.AddToClassList("page"); page.AddToClassList("hidden");
+            var header = new VisualElement();
+            header.AddToClassList("header");
+            var back = new Button { name = "back-episodes-" + n, text = "‹ Back" };
+            back.AddToClassList("back");
+            header.Add(back); header.Add(Flourish()); header.Add(Words("CHAPTER " + n, "page-title")); header.Add(Flourish());
+            page.Add(header);
+            page.Add(Words(c.title, "subtitle"));
+            if (!string.IsNullOrWhiteSpace(c.description)) page.Add(Words(c.description, "subtitle"));
+            var book = new VisualElement();
+            book.AddToClassList("book"); book.AddToClassList("episode-book");
+            var paper = new VisualElement();
+            paper.AddToClassList("paper"); paper.AddToClassList("episode-paper");
+            paper.Add(new PaperGrain());
+            var scroll = new ScrollView(ScrollViewMode.Vertical);
+            scroll.style.flexGrow = 1;
+            for (int i = 0; i < c.episodes.Count; i++)
+            {
+                var e = c.episodes[i];
+                string name = "story-episode-" + n + "-" + (i + 1);
+                var episodeRow = new Button { name = name };
+                episodeRow.AddToClassList("episode-row");
+                var thumb = new VisualElement();
+                thumb.AddToClassList("thumbnail");
+                var picture = e.Picture(c);
+                if (picture != null) thumb.style.backgroundImage = picture;
+                episodeRow.Add(thumb);
+                var text = new VisualElement();
+                text.AddToClassList("grow");
+                text.Add(Words("EPISODE " + (i + 1), "episode-index"));
+                text.Add(Words(e.title, "episode-name"));
+                episodeRow.Add(text);
+                episodeRow.Add(Words("LOCKED", "episode-state", name + "-state"));
+                scroll.Add(episodeRow);
+            }
+            paper.Add(scroll); book.Add(paper); page.Add(book);
+            template.parent.Insert(template.parent.IndexOf(after) + 1, page);
+            after = page;
+        }
     }
 
     // Opens an episode only when progression allows it.
@@ -744,6 +821,13 @@ public class MainMenuNewController : MonoBehaviour
         for (int i = 0; i < episodeNames.Length; i++) { int index = i; Row("episode-" + (i + 1), 2, index + 1, () => PlayEpisode(2, index + 1, FamilyScene(index + 2), index + 2)); }
         for (int i = 0; i < Mindscape.SocialDynamics.SocialDynamicsChapter.EpisodeCount; i++)
         { int episode = i + 1; Row("social-episode-" + episode, 3, episode, () => PlayEpisode(3, episode, Mindscape.SocialDynamics.SocialDynamicsChapter.Scene(episode), episode + 1)); }
+        // Chapters made in the editor (Chapter 4 and later): their rows are built by AddStoryChapters.
+        foreach (var c in StoryChapters.Playable)
+            for (int i = 0; i < c.episodes.Count; i++)
+            {
+                int chapter = c.number, episode = i + 1; string scene = c.episodes[i].scene;
+                Row("story-episode-" + chapter + "-" + episode, chapter, episode, () => PlayEpisode(chapter, episode, scene, episode + 1));
+            }
         On("play-tutorial-1", () => StartScene(tutorialScene, 1, 1, true));
         On("play-tutorial", () => StartScene(tutorialScene, 1, 1, true));
     }
@@ -765,7 +849,7 @@ public class MainMenuNewController : MonoBehaviour
             if (saved == null) { Text(Box(content, "save-slot empty-slot"), "Slot " + (i + 1) + "     —     Empty. Save from the pause menu during an episode.", "small"); continue; }
             int chapter = saved.chapter, episode = saved.episode;
             var slot = Box(content, "save-slot");
-            Box(slot, "thumbnail").style.backgroundImage = Resources.Load<Texture2D>(EpisodeLoadingScreen.Thumbnail(chapter, episode));
+            Box(slot, "thumbnail").style.backgroundImage = EpisodeLoadingScreen.ThumbnailTexture(chapter, episode);
             var copy = Box(slot, "grow");
             Text(copy, "Slot " + (i + 1) + "  ·  " + EpisodeReflection.Label(chapter, episode), "episode-name");
             Text(copy, EpisodeReflection.Title(chapter, episode), "small margin-top");
@@ -801,7 +885,8 @@ public class MainMenuNewController : MonoBehaviour
     string StoryScene(int chapter, int episode) =>
         chapter == 1 && episode >= 1 && episode <= AcademicPressureChapter.EpisodeCount ? AcademicPressureChapter.Scenes[episode - 1]
         : chapter == 2 && episode >= 1 && episode <= 5 ? FamilyScene(episode + 1)
-        : chapter == 3 && episode >= 1 && episode <= Mindscape.SocialDynamics.SocialDynamicsChapter.EpisodeCount ? Mindscape.SocialDynamics.SocialDynamicsChapter.Scene(episode) : null;
+        : chapter == 3 && episode >= 1 && episode <= Mindscape.SocialDynamics.SocialDynamicsChapter.EpisodeCount ? Mindscape.SocialDynamics.SocialDynamicsChapter.Scene(episode)
+        : StoryChapters.Episode(chapter, episode)?.scene;
 
     // ---------------------------------------------------------------- journal
     // The Self-reflection tab is in the UXML; one tab per story episode follows it, under a heading per chapter, in

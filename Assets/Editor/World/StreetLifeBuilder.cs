@@ -39,7 +39,7 @@ public static class StreetLifeBuilder
             "Morning! The school bus will pull in here shortly.", "Stay on the sidewalk and wait behind the curb. I'll let you know when it's safe to board.")
     };
 
-    [MenuItem("Mindscape/Chapter 1 - Academic Pressure/Populate Episode 1 Street", priority = 24)]
+    [MenuItem(LegacyBuilders.Root + "Chapter 1 - Academic Pressure/Populate Episode 1 Street", priority = 24)]
     public static void PopulateOpenScene()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }

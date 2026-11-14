@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 254d8ac804c346de9d9cacf5304e48e0, type: 3}
+  m_Name: Chapter 2 - Episode 3
+  m_EditorClassIdentifier: 
+  seconds: 180
+  questions:
+  - question: A notebook costs 24 pesos. How much do three notebooks cost?
+    answers:
+    - 48 pesos
+    - 72 pesos
+    - 96 pesos
+  - question: "Read: ‘Even though it rained, Ana brought the seedlings outside after the clouds cleared.’\n\nWhen did Ana bring the seedlings outside?"
+    answers:
+    - Before the rain
+    - While it was raining
+    - After the clouds cleared
+  - question: A bus travels 12 kilometers in 30 minutes. At the same speed, how far will it travel in one hour?
+    answers:
+    - 18 kilometers
+    - 24 kilometers
+    - 36 kilometers
+  - question: Which sentence is an observation rather than a prediction?
+    answers:
+    - The clock shows 8:15.
+    - Everyone will finish before me.
+    - This will be my worst examination.
+  - question: A class plants 40 seeds. Three-quarters of them sprout. How many seeds sprout?
+    answers:
+    - 10 seeds
+    - 20 seeds
+    - 30 seeds
+  grounding: 1
+  worry: What if I can't finish?
+  calm: I'm here, in this room. I can return to the next question.

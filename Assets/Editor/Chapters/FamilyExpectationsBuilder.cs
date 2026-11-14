@@ -19,7 +19,7 @@ using Object = UnityEngine.Object;
 // its player rig and Chapter 3's home from them, exactly as before.
 public static partial class AcademicPressureBuilder
 {
-    const string FamilyMenu = "Mindscape/Chapter 2 - Family Expectations/";
+    const string FamilyMenu = LegacyBuilders.Root + "Chapter 2 - Family Expectations/";
     static readonly string[] PrototypeRoots = { "Episode 1 - Family Expectations", "Episode 2 - Before the Bell", "Episode 3 - Running Out of Time", "Episode 4 - Family Finale", "Episode 5 - Family Finale" };
     // Mom, Dad and Tim come from the NPC cast (each has Idle, Walk, Run, Seated_Idle, Sitting_Eating...). These three
     // models belong to the family only: they are left out of the student and walker casts.

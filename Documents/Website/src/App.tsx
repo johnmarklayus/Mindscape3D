@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { useEffect, useRef, useState } from "react"
-import { Download, Gamepad2, Menu, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { Download, Gamepad2, Menu, PanelLeftClose, PanelLeftOpen, Rocket } from "lucide-react"
 import { SidebarContent } from "@/components/Sidebar"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -102,6 +102,12 @@ function App() {
               </a>
             </Button>
           )}
+          <Button asChild variant="outline" size="sm" className="shrink-0">
+            <a href="/onboarding">
+              <Rocket />
+              <span className="max-lg:hidden">{copy.onboarding}</span>
+            </a>
+          </Button>
           <Button asChild size="sm" className="shrink-0">
             <a href="#play-game">
               <Gamepad2 />

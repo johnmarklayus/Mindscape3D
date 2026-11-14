@@ -87,7 +87,8 @@ public class NPC : MonoBehaviour
 
     public bool IsInRange(Transform player)
     {
-        return player != null && Vector3.Distance(transform.position, player.position) <= interactionRadius;
+        // A hidden NPC (a story scene switched it off, e.g. the empty street in Ch3 Ep7) can't be talked to.
+        return player != null && isActiveAndEnabled && Vector3.Distance(transform.position, player.position) <= interactionRadius;
     }
 
     public void RefreshModel()

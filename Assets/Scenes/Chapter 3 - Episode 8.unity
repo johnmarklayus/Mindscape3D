@@ -17739,8 +17739,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4392354, y: 0.19923553, z: 2.0592346}
-  m_Center: {x: 0, y: 0.22000004, z: 1.067348e-15}
+  m_Size: {x: 1.4392354, y: 2.059235, z: 0.19923556}
+  m_Center: {x: 0, y: 0, z: 0.22000003}
 --- !u!65 &1570561549
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17760,8 +17760,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3395177, y: 0.21945839, z: 1.8995175}
-  m_Center: {x: 0, y: 0.42999998, z: 2.0861799e-15}
+  m_Size: {x: 1.3395177, y: 1.8995179, z: 0.21945843}
+  m_Center: {x: 0, y: 0, z: 0.43}
 --- !u!65 &1570561550
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17781,8 +17781,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4396725, y: 0.65967214, z: 0.0796722}
-  m_Center: {x: 0, y: 0.42999998, z: 0.9999998}
+  m_Size: {x: 1.4396725, y: 0.07967222, z: 0.65967226}
+  m_Center: {x: 0, y: -1, z: 0.43}
 --- !u!65 &1570561551
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17802,8 +17802,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4397135, y: 0.3397132, z: 0.0697134}
-  m_Center: {x: 0.000000029802322, y: 0.26999998, z: -0.99999994}
+  m_Size: {x: 1.4397135, y: 0.06971341, z: 0.33971325}
+  m_Center: {x: 0.000000029802322, y: 1.0000001, z: 0.26999998}
 --- !u!1 &1571574873
 GameObject:
   m_ObjectHideFlags: 0
@@ -21862,6 +21862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: d54046ae90ce64c1996dc349197c2433, type: 2}
   moveSpeed: 7
   rotationSpeed: 12
   gravity: -20

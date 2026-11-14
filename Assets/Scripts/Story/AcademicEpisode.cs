@@ -20,7 +20,7 @@ namespace Mindscape.AcademicPressure
     // Every episode also has a stress meter (AddStress / EaseStress), a stress check-in once the episode is over,
     // and a time limit that only runs while the player is in control: when it runs out the episode ends and has to
     // be replayed. The check-in, stress and time go to the database.
-    public abstract class AcademicEpisode : MonoBehaviour, IPausable
+    public abstract partial class AcademicEpisode : MonoBehaviour, IPausable
     {
         public Transform player;
         public Camera storyCamera;
@@ -87,7 +87,7 @@ namespace Mindscape.AcademicPressure
         float stressShown = .2f; // the meter eases toward the real stress level
         UIE.Button completeContinue;
         UIE.Label dialogueMode;
-        UIE.VisualElement dialogueContext, dialogueProgress, dialogueDots;
+        UIE.VisualElement dialogueContext, dialogueProgress;
         UIE.Label dialogueProgressText;
         int dialogueLineNumber = 1, dialogueLineCount = 1;
         UIE.VisualElement finaleScreen, finaleContent; UIE.Label finaleHeading, finaleTitle, finaleBody; UIE.Button finaleMenu;
@@ -153,7 +153,7 @@ namespace Mindscape.AcademicPressure
             }
             // From here every step the player takes is kept (see "saving where you are"); a loaded save replays them.
             recording = true;
-            story = StartCoroutine(Play());
+            story = StartCoroutine(PlayWithCinematics());   // cutscene before, start cinematics, then Play (AcademicEpisode.Cinematics.cs)
             yield return story;
         }
 
@@ -170,7 +170,7 @@ namespace Mindscape.AcademicPressure
         void OnApplicationPause(bool paused) { if (paused) PauseForFocus(); }
         void PauseForFocus()
         {
-            if (!Ready || IsPaused || IsComplete || IsFailed || replay != null || breathing || OverlayOpen || EpisodeLoadingScreen.IsActive) return;
+            if (!Ready || IsPaused || IsComplete || IsFailed || replay != null || breathing || AnyOverlay || EpisodeLoadingScreen.IsActive) return;
             TogglePause();
         }
 
@@ -299,7 +299,7 @@ namespace Mindscape.AcademicPressure
         protected virtual void Update()
         {
             if (replay != null) { if (Time.realtimeSinceStartup - replayStarted > ReplayTimeout) AbortReplay(); return; }
-            if (!Ready || EpisodeLoadingScreen.IsActive || breathing || OverlayOpen) return;
+            if (!Ready || EpisodeLoadingScreen.IsActive || breathing || AnyOverlay) { if (examOpen && !IsPaused) UpdateExam(); return; }
             var k = Keyboard.current;
             if (typing)
             {
@@ -454,16 +454,7 @@ namespace Mindscape.AcademicPressure
 
         void DrawDialogueProgress()
         {
-            if (dialogueProgress == null || dialogueDots == null) return;
-            dialogueDots.Clear();
-            for (int i = 1; i <= dialogueLineCount; i++)
-            {
-                var dot = new UIE.VisualElement { pickingMode = UIE.PickingMode.Ignore };
-                dot.AddToClassList("dialogue-new-dot");
-                dot.EnableInClassList("dialogue-new-dot-complete", i < dialogueLineNumber);
-                dot.EnableInClassList("dialogue-new-dot-lit", i == dialogueLineNumber);
-                dialogueDots.Add(dot);
-            }
+            if (dialogueProgress == null) return;
             dialogueProgress.tooltip = "Dialogue " + dialogueLineNumber + " of " + dialogueLineCount;
             if (dialogueProgressText != null)
                 dialogueProgressText.text = dialogueLineNumber + " / " + dialogueLineCount;
@@ -1163,7 +1154,7 @@ namespace Mindscape.AcademicPressure
             // The tint follows the screen fade (the frame sits above it); the badge stays through fades
             // and steps aside for an episode's own full-screen panel (the examination paper's clock is top-right).
             flashbackTint.style.opacity = 1 - fadeAlpha;
-            ShowScreen(flashbackBadge, !OverlayOpen);
+            ShowScreen(flashbackBadge, !AnyOverlay);
         }
 
         void DrawStatus()
@@ -1172,7 +1163,7 @@ namespace Mindscape.AcademicPressure
             if (statusBox == null) return;
             // The HUD shows while roaming, and steps aside for full-screen overlays (courtroom, journal, exam), which
             // are uGUI and would otherwise sit under these UI Toolkit boxes.
-            bool hudOn = hudShown && !OverlayOpen && !IsPaused;
+            bool hudOn = hudShown && !AnyOverlay && !IsPaused;
             ShowScreen(objectiveBox, hudOn);
             if (!hudOn) ShowScreen(promptBox, false); // Update shows it while roaming, near something to press E for
             bool show = hudOn && !IsFailed;
@@ -1226,6 +1217,8 @@ namespace Mindscape.AcademicPressure
             Time.timeScale = 1;
             if (HasFinale && finaleScreen != null) { if (!finaleStarted) { finaleStarted = true; StartCoroutine(Finale()); } return; }
             if (!NextAvailable) { ReturnToMenu(); return; }
+            // A scene of a chapter made in the editor (Chapter 4 and later) knows its own chapter and episode.
+            if (Mindscape.Data.StoryChapters.Find(NextScene, out int nextChapter, out int nextEpisode)) { EpisodeLoadingScreen.Load(NextScene, nextEpisode, nextChapter); return; }
             if (Chapter == 2 && NextScene.StartsWith("Chapter 3 ")) EpisodeLoadingScreen.Load(NextScene, 1, 3);
             else if (Chapter != 1) EpisodeLoadingScreen.Load(NextScene, Episode + 1, Chapter);
             else if (Episode >= AcademicPressureChapter.EpisodeCount) EpisodeLoadingScreen.Load(NextScene, 1, 2);
@@ -1237,7 +1230,7 @@ namespace Mindscape.AcademicPressure
 
         public void TogglePause()
         {
-            if (!Ready || IsComplete || breathing || OverlayOpen || replay != null) return;
+            if (!Ready || IsComplete || breathing || AnyOverlay || replay != null) return;
             IsPaused = !IsPaused;
             if (IsPaused) { previousTimeScale = Time.timeScale; Time.timeScale = 0; pauseMenu.SetHint(RoamHint); } else Time.timeScale = previousTimeScale;
             if (IsPaused)
@@ -1479,6 +1472,51 @@ namespace Mindscape.AcademicPressure
             Shot(target.position + from.normalized * back + Vector3.up * up, target.position);
         }
 
+        // ---------------------------------------------------------------- story markers (StoryMarker.cs)
+        // A position the code works out (where someone stands, a seat, a camera) can be taken over by a StoryMarker in
+        // the scene with the same id, so it can be moved by dragging in the Scene view instead of editing code.
+
+        /// <summary>
+        /// Every marker id this episode reads, with its built-in placement (used when the scene has no such marker).
+        /// The episode Inspector lists them and creates the missing ones. Must work in edit mode too (no Play-only state).
+        /// </summary>
+        public virtual IEnumerable<StoryMarkerDefault> MarkerDefaults() { yield break; }
+
+        protected static StoryMarker Marker(string id) => StoryMarker.Find(id);
+
+        /// <summary>The marker's position, or the built-in one.</summary>
+        protected static Vector3 Marked(string id, Vector3 fallback)
+        {
+            var m = Marker(id); return m != null ? m.transform.position : fallback;
+        }
+
+        /// <summary>Puts a person at their marker (facing its arrow), or at the built-in spot facing 'face'.</summary>
+        protected static void PlaceMarked(string id, Transform who, Vector3 at, Vector3 face)
+        {
+            if (who == null) return;
+            var m = Marker(id);
+            if (m != null) HomeWelcome.Place(who, m.transform.position, m.transform.position + m.transform.forward);
+            else HomeWelcome.Place(who, at, face);
+        }
+
+        /// <summary>A story shot from the camera marker (exactly where it is, looking along its arrow), or the built-in shot.</summary>
+        protected void MarkedShot(string id, Vector3 position, Vector3 lookAt)
+        {
+            var m = Marker(id);
+            if (m == null) { Shot(position, lookAt); return; }
+            UseShotNearClip();
+            storyCamera.transform.SetPositionAndRotation(m.transform.position, m.transform.rotation);
+            ShotFocus.Set(m.transform.position + m.transform.forward * 4);
+        }
+
+        /// <summary>Glide to the camera marker, or to the built-in shot.</summary>
+        protected IEnumerator MarkedGlide(string id, Vector3 position, Vector3 lookAt, float seconds)
+        {
+            var m = Marker(id);
+            if (m != null) { position = m.transform.position; lookAt = position + m.transform.forward * 4; }
+            yield return Glide(position, lookAt, seconds);
+        }
+
         protected IEnumerator Fade(float from, float to, float seconds)
         {
             for (float t = 0; t < seconds; t += Time.deltaTime) { SetFade(Mathf.Lerp(from, to, t / seconds)); yield return null; }
@@ -1597,7 +1635,6 @@ namespace Mindscape.AcademicPressure
             dialogueMode = dialogueRoot.Q<UIE.Label>("dialogue-mode");
             dialogueContext = dialogueRoot.Q("dialogue-context");
             dialogueProgress = dialogueRoot.Q("dialogue-progress");
-            dialogueDots = dialogueRoot.Q("dialogue-progress-dots");
             dialogueProgressText = dialogueRoot.Q<UIE.Label>("dialogue-progress-text");
             if (dialogueMode != null)
             {

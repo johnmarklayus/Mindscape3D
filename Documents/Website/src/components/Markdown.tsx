@@ -49,7 +49,7 @@ function OrderedSteps({ children }: { children?: ReactNode }) {
   )
 }
 
-const components: Components = {
+export const components: Components = {
   h1: ({ children }) => <SectionTitle>{children}</SectionTitle>,
   h2: ({ children }) => <H2>{children}</H2>,
   h3: ({ children }) => <H3>{children}</H3>,

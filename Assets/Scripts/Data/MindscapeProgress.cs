@@ -4,15 +4,29 @@ namespace Mindscape.Data
 {
     public static class MindscapeProgress
     {
-        public static readonly int[] EpisodeCounts = { 4, 5, 8 };
+        // Chapters 1-3 are in code; Chapter 4 and later come from the chapter assets made in the editor (StoryChapter).
+        static readonly int[] BuiltInCounts = { 4, 5, 8 };
+        public static int[] EpisodeCounts
+        {
+            get
+            {
+                var counts = new System.Collections.Generic.List<int>(BuiltInCounts);
+                foreach (var c in StoryChapters.Playable) counts.Add(c.episodes.Count);
+                return counts.ToArray();
+            }
+        }
         public static int ChapterCount => EpisodeCounts.Length;
         public static int TotalEpisodes { get { int n = 0; foreach (int c in EpisodeCounts) n += c; return n; } }
         public static int EpisodeCount(int chapter) => chapter >= 1 && chapter <= ChapterCount ? EpisodeCounts[chapter - 1] : 0;
 
-        static string SaveKey(int chapter, int episode) => MindscapeDatabase.ProfileKey(
+        static string SaveKey(int chapter, int episode) => CompletionKey(chapter, episode);
+
+        /// <summary>The device save key that marks an episode complete (an episode's CompletionKey must be this).</summary>
+        public static string CompletionKey(int chapter, int episode) => MindscapeDatabase.ProfileKey(
             chapter == 1 ? "Mindscape.AcademicPressure.Episode" + episode :
             chapter == 2 ? "Mindscape.FamilyExpectations.Episode" + episode :
-            "Mindscape.SocialDynamics.Episode" + episode);
+            chapter == 3 ? "Mindscape.SocialDynamics.Episode" + episode :
+            "Mindscape.Chapter" + chapter + ".Episode" + episode);
 
         // The Continue slot (episode 1 = tutorial, story episodes start at 2) and the furthest chapter started,
         // kept per player like every other save on this device.

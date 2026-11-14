@@ -4,6 +4,7 @@ using Mindscape.Data;
 using UnityEngine;
 using UIE = UnityEngine.UIElements;
 using static UnityEngine.UIElements.UQueryExtensions;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.AcademicPressure
 {
@@ -35,10 +36,10 @@ namespace Mindscape.AcademicPressure
 
         // The morning's four steps, ticked off as they are done.
         string Morning() =>
-            Check(bedMade, "Make your bed") +
-            Check(plateWashed, !plateCleared ? "Eat breakfast at the dining table" : "Wash your plate at the kitchen sink") +
-            Check(dressed, "Shower and change into your uniform") +
-            Check(leftHouse, !bagPacked ? "Pick up your school bag" : "Go outside through the front door");
+            Check(bedMade, W("Make your bed")) +
+            Check(plateWashed, !plateCleared ? W("Eat breakfast at the dining table") : W("Wash your plate at the kitchen sink")) +
+            Check(dressed, W("Shower and change into your uniform")) +
+            Check(leftHouse, !bagPacked ? W("Pick up your school bag") : W("Go outside through the front door"));
 
         protected override IEnumerator Play()
         {
@@ -50,21 +51,21 @@ namespace Mindscape.AcademicPressure
             if (routeMarkers != null) routeMarkers.SetActive(false);
             if (bus != null) bus.gameObject.SetActive(false);
 
-            AddSpot(phone, "Check your phone", () => !phoneChecked, CheckPhone);
-            AddSpot(laptop, "Open your laptop", () => phoneChecked && !laptopChecked, OpenLaptop);
+            AddSpot(phone, W("Check your phone"), () => !phoneChecked, CheckPhone);
+            AddSpot(laptop, W("Open your laptop"), () => phoneChecked && !laptopChecked, OpenLaptop);
             // 1. The bed.
-            AddSpot(bed, "Make your bed", () => laptopChecked && !bedMade, MakeBed, 3.6f);
+            AddSpot(bed, W("Make your bed"), () => laptopChecked && !bedMade, MakeBed, 3.6f);
             // 2. Breakfast, then the plate to the sink.
-            AddSpot(plate, "Eat breakfast", () => bedMade && !plateCleared, EatBreakfast);
-            AddSpot(sink, "Wash the plate", () => plateCleared && !plateWashed, WashPlate, 3.6f);
+            AddSpot(plate, W("Eat breakfast"), () => bedMade && !plateCleared, EatBreakfast);
+            AddSpot(sink, W("Wash the plate"), () => plateCleared && !plateWashed, WashPlate, 3.6f);
             // 3. Into the bathroom: a shower and the school uniform (a house without one skips the step).
             dressed = AddBathroom("Take a shower and change into your uniform", () => plateWashed && !dressed, Outfit.SchoolUniform,
                 "A quick shower, then the uniform. Now I look ready, even if I don't feel it.", () => dressed = true) == null;
             // 4. The bag (the books go in with it), then out of the front door. The door opens with its own [ E ];
             // stepping out onto the path is what leaves the house.
-            AddSpot(schoolBag, "Pick up your school bag", () => dressed && !bagPacked, PackBag);
-            AddArrival(Waypoint("Outside the front door", outsideSpawn), "Leave for school", () => bagPacked && !leftHouse, LeaveHouse);
-            AddSpot(busStop, "Wait for the bus", () => leftHouse && !atStop, WaitForBus, 4.5f);
+            AddSpot(schoolBag, W("Pick up your school bag"), () => dressed && !bagPacked, PackBag);
+            AddArrival(Waypoint("Outside the front door", outsideSpawn), W("Leave for school"), () => bagPacked && !leftHouse, LeaveHouse);
+            AddSpot(busStop, W("Wait for the bus"), () => leftHouse && !atStop, WaitForBus, 4.5f);
             GuardBedroomDoor();
 
             // Opening: who is this story about? Joey is still in bed when the alarm goes off.
@@ -75,13 +76,13 @@ namespace Mindscape.AcademicPressure
             var beds = BedStates.InScene();
             bool sleeper = lying && beds != null && beds.Face(headward, out face);
             Shot(bed.position + new Vector3(-3.2f, 3.4f, 3.6f), sleeper ? beds.Top : bed.position);
-            yield return Card("CHAPTER 1  ·  ACADEMIC PRESSURE\n<size=60%>Episode 01  ·  Tomorrow Already?</size>", "Begin  [Space]");
+            yield return Card(W("CHAPTER 1  ·  ACADEMIC PRESSURE\n<size=60%>Episode 01  ·  Tomorrow Already?</size>"), W("Begin  [Space]"));
             // Signed in, the story uses your account username; only offline play asks for a name.
             if (MindscapeCloud.HasAccount) SkipKept('a');   // a save made back when this asked even when signed in
             else
             {
                 string chosen = PlayerName;
-                yield return Ask("Before we begin", "What name should the story use for you?", "Your name", MindscapeDatabase.HasPlayerName ? PlayerName : "", false, 24, "Start", n => chosen = n);
+                yield return Ask(W("Before we begin"), W("What name should the story use for you?"), W("Your name"), MindscapeDatabase.HasPlayerName ? PlayerName : "", false, 24, W("Start"), n => chosen = n);
                 MindscapeDatabase.PlayerName = chosen;
             }
             PlayerName = MindscapeDatabase.PlayerName;
@@ -92,8 +93,8 @@ namespace Mindscape.AcademicPressure
                 : bed.position + new Vector3(-2.4f, 2.6f, 2.4f);
             yield return Glide(closeUp, lying ? face : bed.position + Vector3.up * .4f, 2.2f);
             yield return DialogueSequence(
-                Say("Morning", "An alarm. The room is still half dark.", () => { effects.Stop(); effects.loop = false; }),
-                Think("Morning already.\nBefore anything else, I should check my phone."));
+                Say(W("Morning"), W("An alarm. The room is still half dark."), () => { effects.Stop(); effects.loop = false; }),
+                Think(W("Morning already.\nBefore anything else, I should check my phone.")));
             if (lying)
             {
                 // Up and out of bed, standing beside it.
@@ -102,26 +103,26 @@ namespace Mindscape.AcademicPressure
                 yield return Fade(1, 0, .35f);
             }
 
-            SetObjective("Check your phone", Check(false, "Phone on the bedside table"));
+            SetObjective(W("Check your phone"), Check(false, W("Phone on the bedside table")));
             yield return RoamUntil(() => phoneChecked);
 
-            SetObjective("Look at your project", Check(true, "Phone") + Check(false, "Laptop on the desk"));
+            SetObjective(W("Look at your project"), Check(true, W("Phone")) + Check(false, W("Laptop on the desk")));
             yield return RoamUntil(() => laptopChecked);
 
-            yield return Think("Before I go, there are a few things to do.\nBed, breakfast, a shower, then my bag.");
+            yield return Think(W("Before I go, there are a few things to do.\nBed, breakfast, a shower, then my bag."));
             yield return RoamUntil(() =>
             {
-                SetObjective("Get ready for school", Morning());
+                SetObjective(W("Get ready for school"), Morning());
                 return leftHouse;
             });
 
-            SetObjective("Walk to the bus stop", Check(false, "Follow the blue markers"));
+            SetObjective(W("Walk to the bus stop"), Check(false, W("Follow the blue markers")));
             yield return RoamUntil(() => atStop);
 
             string plan = Recall(AcademicPressureChapter.LaptopPlan) == "one_task" ? "You decided to start with one task first." : "You decided to finish everything tonight.";
-            Complete("Tomorrow already?",
-                "The reminder, the unfinished introduction, and a full morning.\n\n" + plan +
-                "\nYou named a feeling: " + Recall(AcademicPressureChapter.Feeling, "—") + ".\n\nYour choices are saved.");
+            Complete(W("Tomorrow already?"),
+                W("The reminder, the unfinished introduction, and a full morning.\n\n") + plan +
+                W("\nYou named a feeling: ") + Recall(AcademicPressureChapter.Feeling, "—") + W(".\n\nYour choices are saved."));
         }
 
         // ---------------------------------------------------------------- the bedroom door
@@ -139,14 +140,14 @@ namespace Mindscape.AcademicPressure
             Vector3 floor = new Vector3(b.center.x, b.min.y, b.center.z);
             roomSide = floor - outward * 1.8f;
             roomYaw = Quaternion.LookRotation(-outward).eulerAngles.y;
-            var guard = AddArrival(Waypoint("Bedroom doorway (room not done)", floor + outward * 1.4f), "Leave your room", () => !bedMade, NotYet, 1.5f);
+            var guard = AddArrival(Waypoint("Bedroom doorway (room not done)", floor + outward * 1.4f), W("Leave your room"), () => !bedMade, NotYet, 1.5f);
             if (guard.marker != null) { Destroy(guard.marker); guard.marker = null; }   // a reminder, not a goal: no marker
         }
 
         IEnumerator NotYet()
         {
             string left = !phoneChecked ? "check my phone" : !laptopChecked ? "look at my project on the laptop" : "make my bed";
-            yield return Think("Not yet. I should finish things in my room first.\nI still need to " + left + ".");
+            yield return Think(W("Not yet. I should finish things in my room first.\nI still need to ") + left + ".");
             Teleport(roomSide, roomYaw);
         }
 
@@ -156,11 +157,11 @@ namespace Mindscape.AcademicPressure
         {
             ShotOver(phone, 1.6f, 1.2f);
             OpenPhoneLock("7:12", "Monday");
-            PhoneNotification("Reminder", "Research Project Submission", "Tomorrow  —  11:59 PM");
+            PhoneNotification(W("Reminder"), W("Research Project Submission"), W("Tomorrow  —  11:59 PM"));
             yield return DialogueSequence(
-                Think("Tomorrow already?"),
-                Think("I knew it was close. Seeing the date makes it feel closer."),
-                Think("There's still so much left to do on it.\nIt feels like the whole day is already counting down."));
+                Think(W("Tomorrow already?")),
+                Think(W("I knew it was close. Seeing the date makes it feel closer.")),
+                Think(W("There's still so much left to do on it.\nIt feels like the whole day is already counting down.")));
             AddStress(12);
             ClosePhone();
             phoneChecked = true;
@@ -171,24 +172,24 @@ namespace Mindscape.AcademicPressure
             ShotOver(laptop, 1.7f, 1.1f);
             if (laptopScreen != null) laptopScreen.SetActive(true);
             ShowLaptopDocument(true);
-            yield return Me("I haven't even finished the first part.");
+            yield return Me(W("I haven't even finished the first part."));
             ShowLaptopDocument(false);   // the decision gets the whole view
             int plan = 0;
-            yield return Choose("Decision", "What will you do?", new[] { "\"I'll finish everything tonight.\"", "\"I'll start with one task first.\"" }, i => plan = i);
+            yield return Choose(W("Decision"), W("What will you do?"), new[] { W("\"I'll finish everything tonight.\""), W("\"I'll start with one task first.\"") }, i => plan = i);
             Record(AcademicPressureChapter.LaptopPlan, plan == 0 ? "finish_everything" : "one_task");
-            yield return plan == 0 ? Me("I have to finish everything tonight. I can't fall behind.") : Me("Maybe I should just start with one part.");
+            yield return plan == 0 ? Me(W("I have to finish everything tonight. I can't fall behind.")) : Me(W("Maybe I should just start with one part."));
 
             // First CBT feature: thought identification.
-            yield return Card("\"What if I fail this project?\"", "A thought appears  ·  Continue  [Space]");
+            yield return Card(W("\"What if I fail this project?\""), W("A thought appears  ·  Continue  [Space]"));
             AddStress(10);
             string[] feelings = { "Worried", "Overwhelmed", "Frustrated", "Calm" };
             int felt = 0;
-            yield return Choose("Thought identification", "What are you feeling?", feelings, i => felt = i);
+            yield return Choose(W("Thought identification"), W("What are you feeling?"), feelings, i => felt = i);
             Record(AcademicPressureChapter.Feeling, feelings[felt]);
             EaseStress(6);   // naming the feeling
             yield return Think(felt == 3
-                ? "Calm. The deadline is still there, and I can notice it without rushing."
-                : feelings[felt] + ". That's what this feels like right now.\nNoticing it doesn't change the deadline, but it helps me see what's happening.");
+                ? W("Calm. The deadline is still there, and I can notice it without rushing.")
+                : feelings[felt] + W(". That's what this feels like right now.\nNoticing it doesn't change the deadline, but it helps me see what's happening."));
             if (laptopScreen != null) laptopScreen.SetActive(false);
             laptopChecked = true;
         }
@@ -232,7 +233,7 @@ namespace Mindscape.AcademicPressure
         IEnumerator PackBag()
         {
             ShotOver(schoolBag, 2f, 1.3f);
-            yield return Think("ID, notebook, charger, my reference books. Everything for the day goes in here.");
+            yield return Think(W("ID, notebook, charger, my reference books. Everything for the day goes in here."));
             if (books != null) books.gameObject.SetActive(false);
             schoolBag.gameObject.SetActive(false);
             // Worn on the back from here (the old carried box stays hidden).
@@ -256,7 +257,7 @@ namespace Mindscape.AcademicPressure
             }
             else ShotOver(bed, 3.2f, 2.4f);
             yield return Fade(1, 0, .3f);
-            yield return Think("Pillow, blanket, done. One small thing finished.");
+            yield return Think(W("Pillow, blanket, done. One small thing finished."));
             EaseStress(4);
             bedMade = true;
         }
@@ -264,12 +265,12 @@ namespace Mindscape.AcademicPressure
         IEnumerator EatBreakfast()
         {
             ShotOver(plate, 1.8f, 1.3f);
-            yield return Think("Breakfast first. I should eat something before a long day.");
+            yield return Think(W("Breakfast first. I should eat something before a long day."));
             yield return Fade(0, 1, .35f);
             plate.gameObject.SetActive(false);
             if (carriedPlate != null) carriedPlate.SetActive(true);
             yield return Fade(1, 0, .35f);
-            yield return Think("That's better. Now the plate goes to the sink in the kitchen.");
+            yield return Think(W("That's better. Now the plate goes to the sink in the kitchen."));
             EaseStress(3);
             plateCleared = true;
         }
@@ -280,14 +281,14 @@ namespace Mindscape.AcademicPressure
             yield return Fade(0, 1, .3f);
             if (carriedPlate != null) carriedPlate.SetActive(false);
             yield return Fade(1, 0, .3f);
-            yield return Think("Washed and drying. The kitchen is quiet again.");
+            yield return Think(W("Washed and drying. The kitchen is quiet again."));
             plateWashed = true;
         }
 
         IEnumerator LeaveHouse()
         {
             if (routeMarkers != null) routeMarkers.SetActive(true);
-            yield return Think("Fresh air. The bus stop is just down the street.");
+            yield return Think(W("Fresh air. The bus stop is just down the street."));
             leftHouse = true;
         }
 
@@ -296,7 +297,7 @@ namespace Mindscape.AcademicPressure
             atStop = true;
             if (routeMarkers != null) routeMarkers.SetActive(false);
             Shot(busStop.position + new Vector3(-6, 3.5f, -6), busStop.position + Vector3.up);
-            yield return Think("The reminder keeps replaying in my head.\nTomorrow, 11:59 PM.");
+            yield return Think(W("The reminder keeps replaying in my head.\nTomorrow, 11:59 PM."));
             if (bus == null) yield break;
             // The trip to school: the bus pulls in, picks you up, and drives on.
             Vector3 stopAt = bus.position;
@@ -308,7 +309,7 @@ namespace Mindscape.AcademicPressure
             Shot(stopAt + new Vector3(4, 6, -14), stopAt + Vector3.up * 1.5f);
             yield return Fade(1, 0, .35f);
             for (float t = 0; t < 4; t += Time.deltaTime) { bus.position += Vector3.right * Time.deltaTime * (2 + t * 3); yield return null; }
-            yield return Card("On the way to school", "The deadline rides along  ·  Continue  [Space]");
+            yield return Card(W("On the way to school"), W("The deadline rides along  ·  Continue  [Space]"));
         }
     }
 }

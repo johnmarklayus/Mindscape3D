@@ -2,6 +2,7 @@ using System.Collections;
 using System.Linq;
 using Mindscape.AcademicPressure;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.SocialDynamics
 {
@@ -19,8 +20,8 @@ namespace Mindscape.SocialDynamics
                 "This shirt still fits. Okay. I can do this.", () => dressed = true);
             if (bath != null)
             {
-                yield return Think("I should get changed before I go.");
-                SetObjective("Getting ready", Check(false, "Change in the bathroom"));
+                yield return Think(W("I should get changed before I go."));
+                SetObjective(W("Getting ready"), Check(false, W("Change in the bathroom")));
                 yield return RoamUntil(() => dressed);
             }
             else PlayerOutfit.Wear(player, Outfit.GoingOut);
@@ -28,15 +29,15 @@ namespace Mindscape.SocialDynamics
             // Out of the front door (it opens with its own [ E ]).
             HomeWelcome.FrontDoor(spawn.position, out var door, out var inward);
             Vector3 step = Ground(door - inward * 2.6f, door.y) + Vector3.up * .1f;
-            AddArrival(Waypoint("Outside the front door", step), "Head out", () => !outside, () => { outside = true; return Think("The reunion is across town. The bus will get me there."); }, 2f);
-            SetObjective("Head out", Check(true, "Changed") + Check(false, "Out the front door"));
+            AddArrival(Waypoint("Outside the front door", step), W("Head out"), () => !outside, () => { outside = true; return Think(W("The reunion is across town. The bus will get me there.")); }, 2f);
+            SetObjective(W("Head out"), Check(true, W("Changed")) + Check(false, W("Out the front door")));
             yield return RoamUntil(() => outside);
 
             var ride = BusRide.Find();
-            if (ride == null) { yield return Card("On the way to the reunion", "Continue  [Space]"); yield break; }
+            if (ride == null) { yield return Card(W("On the way to the reunion"), W("Continue  [Space]")); yield break; }
             Vector3 kerb = Ground(ride.kerb, step.y);
-            AddArrival(Waypoint("At the bus stop", kerb + Vector3.up * .1f), "Walk to the bus stop", () => !atStop, () => { atStop = true; return Nothing(); }, 3f);
-            SetObjective("To the bus stop", Check(true, "Out the front door") + Check(false, "The bus stop down the street"));
+            AddArrival(Waypoint("At the bus stop", kerb + Vector3.up * .1f), W("Walk to the bus stop"), () => !atStop, () => { atStop = true; return Nothing(); }, 3f);
+            SetObjective(W("To the bus stop"), Check(true, W("Out the front door")) + Check(false, W("The bus stop down the street")));
             yield return RoamUntil(() => atStop);
 
             // The bus pulls in at the shelter.
@@ -47,7 +48,7 @@ namespace Mindscape.SocialDynamics
             Shot(kerb + toKerb * 6 - ride.heading * 7 + Vector3.up * 4, ride.stop + Vector3.up * 2);
             ShotFocus.Clear();
             yield return ride.Drive(-70, 0, 6f, true);
-            yield return Think("Here it is. No turning back now.");
+            yield return Think(W("Here it is. No turning back now."));
             // On board; the camera follows the bus down the road.
             yield return Fade(0, 1, .4f);
             player.gameObject.SetActive(false);
@@ -56,9 +57,9 @@ namespace Mindscape.SocialDynamics
             StartCoroutine(ride.Drive(0, 140, 9f, false, () =>
                 Shot(ride.bus.position + toKerb * 19 + Vector3.up * 8.5f - ride.heading * 14, ride.bus.position + Vector3.up * 2f)));
             StartCoroutine(After(9f, () => gone = true));
-            yield return Think("Everyone will be there. I hope I still remember how to talk to them.");
+            yield return Think(W("Everyone will be there. I hope I still remember how to talk to them."));
             while (!gone) yield return null;
-            yield return Card("On the way to the reunion", "Continue  [Space]");
+            yield return Card(W("On the way to the reunion"), W("Continue  [Space]"));
             player.gameObject.SetActive(true);
         }
 
@@ -107,9 +108,9 @@ namespace Mindscape.SocialDynamics
             Vector3 eye = HomeWelcome.ClearView(outside + Vector3.up * 2.2f, outside - inward * 1.5f + side * 4.5f + Vector3.up * 3.4f);
             Shot(eye, (kerb + outside) * .5f + Vector3.up * 1.8f);
             ShotFocus.Clear();
-            yield return Think("This is the place. I can hear music from inside.");
+            yield return Think(W("This is the place. I can hear music from inside."));
             yield return WalkTo(outside, Quaternion.LookRotation(inward).eulerAngles.y, Mathf.Clamp(Vector3.Distance(Flat(kerb), Flat(outside)) / 2.4f, 1.5f, 5f));
-            yield return Think("Okay. Just say hello. That's all I have to do.");
+            yield return Think(W("Okay. Just say hello. That's all I have to do."));
             yield return Fade(0, 1, .5f);
             Teleport(ClearSpawn(), spawn.eulerAngles.y);
             Shot(openingView.position, openingView.position + openingView.forward * 8);
@@ -143,8 +144,8 @@ namespace Mindscape.SocialDynamics
             ShotFocus.Clear();
             yield return Fade(1, 0, 1f);
             var drift = StartCoroutine(Glide(park.joey - toFountain * 4.5f - across * 2.6f + Vector3.up * h * .8f, look, 7f));
-            yield return Think("It's quieter out here. Just the water and the lights.");
-            yield return Think("Maybe nobody will notice I'm gone.");
+            yield return Think(W("It's quieter out here. Just the water and the lights."));
+            yield return Think(W("Maybe nobody will notice I'm gone."));
             StopCoroutine(drift);
 
             // Footsteps on the path: Justin, looking for him.
@@ -153,7 +154,7 @@ namespace Mindscape.SocialDynamics
                 Shot(park.joey + toFountain * 3.2f + across * 2.4f + Vector3.up * h * .75f, (park.joey + park.justinTo) * .5f + Vector3.up * h * .5f);
                 ShotFocus.Clear();
                 var walk = StartCoroutine(HomeWelcome.StepToward(justin, justinTo, 4.2f));
-                yield return Think("Footsteps on the path behind me.");
+                yield return Think(W("Footsteps on the path behind me."));
                 yield return walk;
                 StartCoroutine(Turn(player, Quaternion.LookRotation(Flat(justin.position - player.position)), .5f));
                 yield return HomeWelcome.TurnTo(justin, player.position, .4f);

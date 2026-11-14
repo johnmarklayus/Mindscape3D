@@ -36,6 +36,48 @@ public static class BedInstaller
         return log;
     }
 
+    // The bed parts' box colliders, fitted to their meshes as imported now. A collider that already exists is refitted
+    // too: the first colliders were sized while the FBX still came in Z-up, and stayed standing on end (upright slabs up
+    // to 2.4 m high) after the re-export, so the Ch2 Ep1 school bag landed on top of them and floated over the bed.
+    static readonly string[] ColliderParts = { "Bed frame | Bed_Mattress", "Bed frame | Bed_Frame", "Bed frame | Bed_Headboard", "Bed frame | Bed_Footboard" };
+    static int FitColliders(Transform bed)
+    {
+        int fitted = 0;
+        foreach (var name in ColliderParts)
+        {
+            var part = FindDeep(bed, name);
+            var filter = part != null ? part.GetComponent<MeshFilter>() : null;
+            var mesh = filter != null ? filter.sharedMesh : null;
+            if (mesh == null) continue;
+            var box = part.GetComponent<BoxCollider>();
+            if (box == null) box = part.gameObject.AddComponent<BoxCollider>();
+            if (box.center == mesh.bounds.center && box.size == mesh.bounds.size) continue;
+            box.center = mesh.bounds.center; box.size = mesh.bounds.size;
+            PrefabUtility.RecordPrefabInstancePropertyModifications(box);
+            fitted++;
+        }
+        return fitted;
+    }
+
+    // Refits the bed colliders in every scene that has the Joey Bed, without moving the bed.
+    [MenuItem("Mindscape/House/Refit Joey Bed Colliders (all scenes)")]
+    static void RefitMenu() => Debug.Log(RefitCollidersAll());
+    public static string RefitCollidersAll()
+    {
+        string active = SceneManager.GetActiveScene().path, log = "";
+        foreach (var path in Directory.GetFiles("Assets/Scenes", "*.unity"))
+        {
+            var scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+            var bed = scene.GetRootGameObjects().Select(g => g.GetComponentInChildren<BedStates>(true)).FirstOrDefault(b => b != null);
+            if (bed == null) continue;
+            int fitted = FitColliders(bed.transform);
+            if (fitted > 0) { EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene); }
+            log += "Joey bed colliders · " + Path.GetFileNameWithoutExtension(path) + ": " + fitted + " refitted\n";
+        }
+        if (!string.IsNullOrEmpty(active)) EditorSceneManager.OpenScene(active, OpenSceneMode.Single);
+        return log;
+    }
+
     // Null when the scene has no house bed.
     public static string Apply(Scene scene)
     {
@@ -104,11 +146,7 @@ public static class BedInstaller
         tr.position = new Vector3(area.center.x, area.min.y, area.center.z) - centreOffset;
 
         // Something solid to bump into and to lie on (the story raycasts down onto the mattress).
-        foreach (var name in new[] { "Bed frame | Bed_Mattress", "Bed frame | Bed_Frame", "Bed frame | Bed_Headboard", "Bed frame | Bed_Footboard" })
-        {
-            var part = Part(name);
-            if (part != null && part.GetComponent<Collider>() == null) part.gameObject.AddComponent<BoxCollider>();
-        }
+        FitColliders(tr);
 
         if (states.sleepingBoy != null) states.sleepingBoy.SetActive(false);
         if (states.sleepingGirl != null) states.sleepingGirl.SetActive(false);

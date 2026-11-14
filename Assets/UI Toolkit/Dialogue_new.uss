@@ -43,17 +43,7 @@
 }
 .dialogue-new-mode { color: #B7AA8C; font-size: 14px; letter-spacing: 0.6px; }
 .dialogue-new-progress { flex-direction: row; align-items: center; margin-left: 24px; max-width: 90%; flex-shrink: 1; }
-.dialogue-new-dots { flex-direction: row; align-items: center; flex-wrap: wrap; flex-shrink: 1; }
-.dialogue-new .dialogue-new-progress-text { color: #B7AA8C; font-size: 12px; margin-left: 8px; white-space: nowrap; }
-.dialogue-new-dot {
-    width: 8px;
-    height: 8px;
-    margin-right: 6px;
-    border-radius: 4px;
-    background-color: rgba(226, 181, 102, 0.15);
-}
-.dialogue-new-dot-complete { background-color: #9A7945; }
-.dialogue-new-dot-lit { background-color: #F1BB62; }
+.dialogue-new .dialogue-new-progress-text { color: #B7AA8C; font-size: 12px; margin-left: 0; white-space: nowrap; }
 
 .dialogue-new-body { flex-direction: row; align-items: center; }
 .dialogue-new .dialogue-new-speech {

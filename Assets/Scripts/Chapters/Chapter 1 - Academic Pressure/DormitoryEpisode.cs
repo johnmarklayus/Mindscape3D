@@ -3,6 +3,7 @@ using Mindscape.Data;
 using UnityEngine;
 using UIE = UnityEngine.UIElements;
 using static UnityEngine.UIElements.UQueryExtensions;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.AcademicPressure
 {
@@ -49,19 +50,19 @@ namespace Mindscape.AcademicPressure
         {
             everything = Recall(AcademicPressureChapter.LaptopPlan) != "one_task";
             BuildTaskList();
-            AddSpot(desk, "Sit at your desk", () => inDorm && !seated, SitDown, 3.6f);
+            AddSpot(desk, W("Sit at your desk"), () => inDorm && !seated, SitDown, 3.6f);
             PlayerBackpack.Wear(player, true);   // back from classes with the school bag still on
 
             if (walkStart != null && dormInside != null)
             {
                 if (routeMarkers != null) routeMarkers.SetActive(false);
-                AddArrival(dormInside, "Go into the dorm", () => !inDorm, EnterDorm, 2.4f);
+                AddArrival(dormInside, W("Go into the dorm"), () => !inDorm, EnterDorm, 2.4f);
                 Teleport(walkStart.position, walkStart.eulerAngles.y);
                 Shot(walkStart.position + walkStart.rotation * new Vector3(0, 5, -5), walkStart.position + walkStart.forward * 10);
-                yield return Card("Episode 04  ·  One Step at a Time", "Begin  [Space]");
-                yield return Think("Lunch is over and so are classes.\nThe dorm is at the other end of the corridor.");
+                yield return Card(W("Episode 04  ·  One Step at a Time"), W("Begin  [Space]"));
+                yield return Think(W("Lunch is over and so are classes.\nThe dorm is at the other end of the corridor."));
                 if (routeMarkers != null) routeMarkers.SetActive(true);
-                SetObjective("Walk back to the dorm", Check(false, "Follow the corridor  ·  hold Shift to run"));
+                SetObjective(W("Walk back to the dorm"), Check(false, W("Follow the corridor  ·  hold Shift to run")));
                 yield return RoamUntil(() => inDorm);
                 if (routeMarkers != null) routeMarkers.SetActive(false);
             }
@@ -70,26 +71,26 @@ namespace Mindscape.AcademicPressure
                 inDorm = true;
                 Teleport(spawn.position, spawn.eulerAngles.y);
                 Shot(spawn.position + spawn.rotation * new Vector3(0, 4.5f, -4), desk.position);
-                yield return Card("Episode 04  ·  One Step at a Time", "Begin  [Space]");
-                yield return Think("Back in the dorm. It's quiet in here.", () => AddStress(10));
+                yield return Card(W("Episode 04  ·  One Step at a Time"), W("Begin  [Space]"));
+                yield return Think(W("Back in the dorm. It's quiet in here."), () => AddStress(10));
             }
-            yield return Think("The deadline. The announcement. What they said at lunch.\nEverything from today is louder now that I'm sitting still.");
+            yield return Think(W("The deadline. The announcement. What they said at lunch.\nEverything from today is louder now that I'm sitting still."));
 
             if (everything)
             {
                 // This morning's plan: no stopping until everything is done.
-                yield return Think("I said I'd finish everything tonight. No breaks. If I stop now, I'll fall behind.", () => AddStress(5));
+                yield return Think(W("I said I'd finish everything tonight. No breaks. If I stop now, I'll fall behind."), () => AddStress(5));
             }
             else
             {
-                yield return Think("Before I decide what to do next, I can take a moment to breathe.");
+                yield return Think(W("Before I decide what to do next, I can take a moment to breathe."));
                 bool deskBreathCompleted = false;
                 yield return Breathe(done => deskBreathCompleted = done);
                 Record("academic.desk_breathing", deskBreathCompleted ? "completed" : "closed_early");
-                yield return Think("The deadline is still there. I can meet it one part at a time.");
+                yield return Think(W("The deadline is still there. I can meet it one part at a time."));
             }
 
-            SetObjective("Sit at your desk", Check(false, "The desk under the window"));
+            SetObjective(W("Sit at your desk"), Check(false, W("The desk under the window")));
             yield return RoamUntil(() => seated);
 
             // At the desk: look at what's there, then open the laptop for a task list instead of "finish entire project".
@@ -97,15 +98,15 @@ namespace Mindscape.AcademicPressure
             while (!laptopOpened)
             {
                 int pick = 0;
-                yield return Choose("At the desk", "What do you look at?", new[] { "The unfinished project", "The notebook", "The phone", "Open the laptop" }, i => pick = i);
-                if (pick == 0) { yield return Glide(deskView.position, unfinishedProject.position, .6f); yield return Think("A draft with gaps in it. Seeing it all at once makes it look bigger than it is."); }
-                else if (pick == 1) { yield return Glide(deskView.position, notebook.position, .6f); yield return Think("My notes from class. Some of them already make sense."); }
+                yield return Choose(W("At the desk"), W("What do you look at?"), new[] { W("The unfinished project"), W("The notebook"), W("The phone"), W("Open the laptop") }, i => pick = i);
+                if (pick == 0) { yield return Glide(deskView.position, unfinishedProject.position, .6f); yield return Think(W("A draft with gaps in it. Seeing it all at once makes it look bigger than it is.")); }
+                else if (pick == 1) { yield return Glide(deskView.position, notebook.position, .6f); yield return Think(W("My notes from class. Some of them already make sense.")); }
                 else if (pick == 2)
                 {
                     yield return Glide(deskView.position, phone.position, .6f);
                     OpenPhoneLock("9:40", "Monday");
-                    PhoneNotification("Reminder", "Research Project Submission", "Tomorrow  —  11:59 PM");
-                    yield return Think("The same reminder from this morning.\nResearch Project Submission. Tomorrow, 11:59 PM.");
+                    PhoneNotification(W("Reminder"), W("Research Project Submission"), W("Tomorrow  —  11:59 PM"));
+                    yield return Think(W("The same reminder from this morning.\nResearch Project Submission. Tomorrow, 11:59 PM."));
                     ClosePhone();
                 }
                 else laptopOpened = true;
@@ -116,17 +117,17 @@ namespace Mindscape.AcademicPressure
             if (everything) yield return Exhausted();
             else
             {
-                yield return Think("One part is done. The rest can wait its turn.");
+                yield return Think(W("One part is done. The rest can wait its turn."));
                 EaseStress(15);
             }
 
             // The reflection journal and self-assessment follow when the episode completes (AcademicEpisode.Reflect).
             Shot(deskView.position, desk.position + Vector3.up * .3f);
-            yield return Think("I don't have to solve everything at once.\nI can take one step at a time.");
+            yield return Think(W("I don't have to solve everything at once.\nI can take one step at a time."));
 
-            Complete("One step at a time", everything
-                ? "From the reminder this morning to the desk tonight, you noticed your thoughts, examined a comparison, and pushed through every task in one night.\n\nIt got done, and it wore you out. The breath helped you come back to yourself."
-                : "From the reminder this morning to the desk tonight, you noticed your thoughts, took a breath, examined a comparison, and finished one small task.");
+            Complete(W("One step at a time"), everything
+                ? W("From the reminder this morning to the desk tonight, you noticed your thoughts, examined a comparison, and pushed through every task in one night.\n\nIt got done, and it wore you out. The breath helped you come back to yourself.")
+                : W("From the reminder this morning to the desk tonight, you noticed your thoughts, took a breath, examined a comparison, and finished one small task."));
         }
 
         IEnumerator EnterDorm()
@@ -134,8 +135,8 @@ namespace Mindscape.AcademicPressure
             inDorm = true;
             AddStress(10);
             yield return Think(roommates != null && roommates.Length > 0
-                ? "Back in the dorm. My roommates are already studying.\nIt's quiet, except for pages turning."
-                : "Back in the dorm. It's quiet in here.");
+                ? W("Back in the dorm. My roommates are already studying.\nIt's quiet, except for pages turning.")
+                : W("Back in the dorm. It's quiet in here."));
         }
 
         IEnumerator SitDown()
@@ -153,13 +154,13 @@ namespace Mindscape.AcademicPressure
             }
             if (everything)
                 yield return DialogueSequence(
-                    Me("I still have a lot to do."),
-                    BeforeDialogue(new WaitForSeconds(1.2f), Think("This morning I wanted to finish everything tonight. That's still the plan.")));
+                    Me(W("I still have a lot to do.")),
+                    BeforeDialogue(new WaitForSeconds(1.2f), Think(W("This morning I wanted to finish everything tonight. That's still the plan."))));
             else
                 yield return DialogueSequence(
-                    Me("I still have a lot to do."),
-                    BeforeDialogue(new WaitForSeconds(1.2f), Me("But I don't have to finish everything at once.")),
-                    Think("This morning I said I'd start with one task. That still feels right."));
+                    Me(W("I still have a lot to do.")),
+                    BeforeDialogue(new WaitForSeconds(1.2f), Me(W("But I don't have to finish everything at once."))),
+                    Think(W("This morning I said I'd start with one task. That still feels right.")));
             seated = true;
         }
 
@@ -169,17 +170,17 @@ namespace Mindscape.AcademicPressure
             if (deskLamp != null) deskLamp.intensity = 1.6f;
             Shot(deskView.position, desk.position + Vector3.up * .3f);
             yield return DialogueSequence(
-                Think("It's done. All of it."),
-                Think("So why do I feel this heavy?"),
-                Think("My eyes sting. My shoulders are tight. I've read the same sentence three times and none of it stayed."),
-                Think("I pushed through everything at once, and now I can barely think."));
-            yield return Think("I need to stop for a moment and breathe.");
+                Think(W("It's done. All of it.")),
+                Think(W("So why do I feel this heavy?")),
+                Think(W("My eyes sting. My shoulders are tight. I've read the same sentence three times and none of it stayed.")),
+                Think(W("I pushed through everything at once, and now I can barely think.")));
+            yield return Think(W("I need to stop for a moment and breathe."));
             bool completed = false;
             yield return Breathe(done => completed = done, 20);
             Record("academic.exhaustion_breathing", completed ? "completed" : "closed_early");
             yield return DialogueSequence(
-                Think("A little steadier now."),
-                Think("Finishing everything tonight cost me a lot. Next time, starting with one part might be kinder to me."));
+                Think(W("A little steadier now.")),
+                Think(W("Finishing everything tonight cost me a lot. Next time, starting with one part might be kinder to me.")));
         }
 
         // ---------------------------------------------------------------- task list

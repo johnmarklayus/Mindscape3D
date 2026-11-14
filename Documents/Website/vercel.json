@@ -3,23 +3,54 @@
     {
       "source": "/game-builds/:path*/Build/:file*.data.br",
       "headers": [
-        { "key": "Content-Encoding", "value": "br" },
-        { "key": "Content-Type", "value": "application/octet-stream" }
+        {
+          "key": "Content-Encoding",
+          "value": "br"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/octet-stream"
+        }
       ]
     },
     {
       "source": "/game-builds/:path*/Build/:file*.wasm.br",
       "headers": [
-        { "key": "Content-Encoding", "value": "br" },
-        { "key": "Content-Type", "value": "application/wasm" }
+        {
+          "key": "Content-Encoding",
+          "value": "br"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/wasm"
+        }
       ]
     },
     {
       "source": "/game-builds/:path*/Build/:file*.js.br",
       "headers": [
-        { "key": "Content-Encoding", "value": "br" },
-        { "key": "Content-Type", "value": "application/javascript" }
+        {
+          "key": "Content-Encoding",
+          "value": "br"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/onboarding",
+      "destination": "/index.html"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/onboarding/",
+      "destination": "/onboarding",
+      "permanent": true
     }
   ]
 }

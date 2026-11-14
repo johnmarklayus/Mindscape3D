@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mindscape.Minigames;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.AcademicPressure
 {
@@ -34,35 +35,35 @@ namespace Mindscape.AcademicPressure
             courtroom.startOpen = false; // opened by the story, closes itself when the case is done
             courtroom.cases = new List<WorryCourtroomCase> { worryCase }; courtroom.startCase = 0;
             // The cafeteria door opens with its own [ E ]; walking in past it is what arrives.
-            if (cafeteriaDoor != null) AddArrival(inside != null ? inside : cafeteriaDoor, "Go into the cafeteria", () => !arrived, EnterCafeteria, 2.4f);
+            if (cafeteriaDoor != null) AddArrival(inside != null ? inside : cafeteriaDoor, W("Go into the cafeteria"), () => !arrived, EnterCafeteria, 2.4f);
             else arrived = true;
-            AddSpot(table, "Sit with your classmates", () => arrived && !joined, JoinTable, 3.8f);
+            AddSpot(table, W("Sit with your classmates"), () => arrived && !joined, JoinTable, 3.8f);
             if (routeMarkers != null) routeMarkers.SetActive(false);
 
             Teleport(spawn.position, spawn.eulerAngles.y);
             PlayerBackpack.Wear(player, true);   // still a school day: the bag goes along to lunch
             Shot(spawn.position + spawn.rotation * new Vector3(0, 5, -5), spawn.position + spawn.forward * 10);
-            yield return Card("Episode 03  ·  Everyone Seems Ahead", "Begin  [Space]");
-            yield return Think("Lunch. " + friendName + " said they'd save a seat.\nThe cafeteria is at the end of the corridor.");
+            yield return Card(W("Episode 03  ·  Everyone Seems Ahead"), W("Begin  [Space]"));
+            yield return Think(W("Lunch. ") + friendName + W(" said they'd save a seat.\nThe cafeteria is at the end of the corridor."));
 
             if (!arrived)
             {
                 if (routeMarkers != null) routeMarkers.SetActive(true);
-                SetObjective("Go to the cafeteria", Check(false, "Follow the corridor  ·  hold Shift to run"));
+                SetObjective(W("Go to the cafeteria"), Check(false, W("Follow the corridor  ·  hold Shift to run")));
                 yield return RoamUntil(() => arrived);
             }
-            SetObjective("Find a seat for lunch", Check(true, "Cafeteria") + Check(false, "Join your classmates"));
+            SetObjective(W("Find a seat for lunch"), Check(true, W("Cafeteria")) + Check(false, W("Join your classmates")));
             yield return RoamUntil(() => joined);
 
-            Complete("Everyone seems ahead",
-                "You noticed a comparison thought and put it on trial.\n\n" +
-                "Balanced thought:\n\"" + Recall(AcademicPressureChapter.BalancedThought, DefaultBalancedThought) + "\"\n\nYour courtroom record is saved.");
+            Complete(W("Everyone seems ahead"),
+                W("You noticed a comparison thought and put it on trial.\n\n") +
+                W("Balanced thought:\n\"") + Recall(AcademicPressureChapter.BalancedThought, DefaultBalancedThought) + W("\"\n\nYour courtroom record is saved."));
         }
 
         IEnumerator EnterCafeteria()
         {
             if (routeMarkers != null) routeMarkers.SetActive(false);
-            yield return Think("Trays, voices, the long tables.\n" + friendName + " is waving from the table near the door.");
+            yield return Think(W("Trays, voices, the long tables.\n") + friendName + W(" is waving from the table near the door."));
             arrived = true;
         }
 
@@ -75,11 +76,11 @@ namespace Mindscape.AcademicPressure
 
             if (studentOne != null) yield return Glide(tableView.position, studentOne.position + Vector3.up * 1.4f, .8f);
             yield return DialogueSequence(
-                Say("Student 1", "I already finished my presentation."),
+                Say(W("Student 1"), W("I already finished my presentation.")),
                 BeforeDialogue(studentTwo != null ? Glide(tableView.position, studentTwo.position + Vector3.up * 1.4f, .8f) : null,
-                    Say("Student 2", "Same. I'm just practicing now.")),
-                Think("Everyone is ahead of me."),
-                Think("Maybe I'm not good enough."));
+                    Say(W("Student 2"), W("Same. I'm just practicing now."))),
+                Think(W("Everyone is ahead of me.")),
+                Think(W("Maybe I'm not good enough.")));
             AddStress(15);
 
             // The screen changes: the worry goes to court. The story panels are UI Toolkit and would sit over it.
@@ -106,10 +107,10 @@ namespace Mindscape.AcademicPressure
             if (tableView != null) Shot(tableView.position, table.position + Vector3.up * 1.2f);
             yield return DialogueSequence(
                 Think("\"" + balanced + "\""),
-                Think("The thought is still there. It just isn't the only one anymore.", () => EaseStress(18)),
+                Think(W("The thought is still there. It just isn't the only one anymore."), () => EaseStress(18)),
                 BeforeDialogue(friend != null ? Glide(tableView.position, friend.position + Vector3.up * 1.4f, .8f) : null,
-                    Say(friendName, "You okay? You went quiet for a second.")),
-                Me(Recall(AcademicPressureChapter.FriendReply) == "fine" ? "Yeah. Just thinking. I'll figure out my next step tonight." : "A little better. I'll work on it tonight, one part at a time."));
+                    Say(friendName, W("You okay? You went quiet for a second."))),
+                Me(Recall(AcademicPressureChapter.FriendReply) == "fine" ? W("Yeah. Just thinking. I'll figure out my next step tonight.") : W("A little better. I'll work on it tonight, one part at a time.")));
             joined = examined;
         }
 

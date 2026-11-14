@@ -19,16 +19,17 @@ public static class SocialDynamicsBuilder
     const float Scale = AcademicPressureBuilder.PeopleScale, FriendHeight = 2.45f * AcademicPressureBuilder.PeopleScale;
     // Joey's room in the current house: the desk is on the east wall, the free south-west wall holds the mirror.
     static readonly Vector3 DeskTop = new Vector3(-10.7f, 2.39f, -9.75f), MirrorWall = new Vector3(-18.1f, 0, -14.1f);
-    [MenuItem("Mindscape/Chapter 3 - Social Dynamics/Build All Eight Episodes")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 3 - Social Dynamics/Build All Eight Episodes")]
     public static void Build() => Build(1, 8);
 
     // Episodes 2-6 only (the reunion on the school grounds); the home episodes are left as they are.
-    [MenuItem("Mindscape/Chapter 3 - Social Dynamics/Rebuild the Reunion Episodes (2-6)")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 3 - Social Dynamics/Rebuild the Reunion Episodes (2-6)")]
     public static void BuildReunion() => Build(2, 6);
 
     static void Build(int first, int last)
     {
         if (EditorApplication.isPlaying) throw new InvalidOperationException("Exit Play mode before building.");
+        if (!LegacyBuilders.ConfirmRebuild("Chapter 3 episodes " + first + "-" + last)) return;
         if (SceneManager.GetActiveScene().isDirty) throw new InvalidOperationException("Save the open scene first.");
         var setup = EditorSceneManager.GetSceneManagerSetup();
         Directory.CreateDirectory("Assets/SocialDynamics/Materials"); Directory.CreateDirectory("Assets/Resources/SocialDynamics");

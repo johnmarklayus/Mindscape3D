@@ -23,28 +23,44 @@ Every custom Editor tool in the project, and what it does.
 
 | Menu Path | What it does |
 | --- | --- |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Build Cutscene Slides` | Rebuilds Episode 1's four-slide cutscene with art and narration. |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Populate House NPCs` | Places Mom, Dad and Tim with name tags and their dialogue, and sets the Quest's required people. |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Add NPC Wandering` | Places waypoints and `NPCWander` on the three NPCs, and checks each route for obstacles. |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Add Worry Courtroom and Breathing Screen` | Adds the courtroom prefab and presentation case and registers both minigames on the Quest. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Build Cutscene Slides` | Rebuilds Episode 1's four-slide cutscene with art and narration. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Populate House NPCs` | Places Mom, Dad and Tim with name tags and their dialogue, and sets the Quest's required people. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Add NPC Wandering` | Places waypoints and `NPCWander` on the three NPCs, and checks each route for obstacles. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ Add Worry Courtroom and Breathing Screen` | Adds the courtroom prefab and presentation case and registers both minigames on the Quest. |
 | `Mindscape ▸ Minigame Lab ▸ Create or Open Test Scene` | Creates or opens the ten-minigame practice lab. |
 | `Mindscape ▸ Minigame Lab ▸ Verify All Games (Play Mode)` | Runs automated checks on the lab minigames. |
 | `Mindscape ▸ Main Menu New ▸ Create Scene` | Builds the newer main menu scene. The menu's pages themselves live in `MainMenuNew.uxml`; edit them in UI Builder. |
 | `Mindscape ▸ Verify ▸ Story Shot Clearance` | Walks the player around every story shot target at every interaction distance and fails if a shot ends up inside the body's clearance (see [Camera & Story Shots](#system-camera)). |
 
-### Chapters
+### Story (making and editing episodes)
 
 | Menu Path | What it does |
 | --- | --- |
-| `Mindscape ▸ Chapter 1 - Academic Pressure ▸ Build All Episodes` | Rebuilds the four Chapter 1 scenes. Each episode also has its own item (`Build Episode 1 - House` to `Build Episode 4 - Dormitory`). Save unrelated scene work first. |
-| `Mindscape ▸ Chapter 1 - Academic Pressure ▸ Episode 4 - Add the Walk From the Cafeteria` | Adds the cafeteria start, the route to the dorm and the three studying roommates to the existing Episode 4 scene. Safe to re-run. |
-| `Mindscape ▸ Chapter 1 - Academic Pressure ▸ Populate Episode 1 Street` | Rebuilds the Street Life NPCs, their sidewalk routes and the Nia and Hana conversation in the open house scene. |
-| `Mindscape ▸ Chapter 1 - Academic Pressure ▸ Move Family Expectations to Chapter 2` | One-off move of the old family scenes into Chapter 2. |
-| `Mindscape ▸ Chapter 1 - Academic Pressure ▸ Reveal Database File` | Shows the SQLite save file in the file manager. |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Build All Episodes` | Rebuilds the five Chapter 2 scenes (per-episode items, and `Episode 4 - Update the Dinner Table`, are listed beside it). |
-| `Mindscape ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ ...` | Bedroom layout, house NPCs, NPC wandering, cutscene slides and the courtroom for the original Episode 1. |
-| `Mindscape ▸ Chapter 3 - Social Dynamics ▸ Build All Eight Episodes` | Generates the eight Chapter 3 scenes. |
-| `Mindscape ▸ Chapter 3 - Social Dynamics ▸ Rebuild the Reunion Episodes (2-6)` | Rebuilds only the five reunion scenes. |
+| `Mindscape ▸ Story ▸ New Chapter…` | Makes a chapter (Chapter 4 and later) as an asset in `Assets/Resources/Chapters/`: number, name, description and an imported picture. The main menu, loading screen, progress and journal read it by themselves. See [Onboarding](/onboarding#create-chapter). |
+| `Mindscape ▸ Story ▸ New Cutscene…` | Makes a slide cutscene (pictures with words) from pictures on your computer, and can set it to play before an episode or as a scene of its own. See [Onboarding](/onboarding#create-cutscene). |
+| `Mindscape ▸ Story ▸ New Cinematic (in the open scene)` | Adds a cinematic to the open episode scene: a place, a camera view from the Scene view and a first line, edited as a list of steps in the Inspector. See [Onboarding](/onboarding#create-cinematic). |
+| `Mindscape ▸ Story ▸ New Conversation` | Makes a conversation asset in `Assets/Story/Conversations` (lines with who speaks and the words), played by a cinematic step. See [Onboarding](/onboarding#create-conversation). |
+| `Mindscape ▸ Story ▸ New Exam Paper` | Makes an exam paper in `Assets/Story/Exams` (up to 5 questions, 3 answers each) for the cinematic step *Minigame: exam paper*. See [Onboarding](/onboarding#minigame-steps). |
+| `Mindscape ▸ Story ▸ Edit Dialogue Words (Chapters 1-3)` | Lists every line the Chapter 1–3 scripts show in `Assets/Resources/Story/Dialogue Words.asset`, where each can be changed in the Inspector. See [Onboarding](/onboarding#edit-words). |
+| `Mindscape ▸ Story ▸ New Episode…` | Makes a new episode scene by copying an existing one (place, lighting, player, camera), adds it to the build list and, if asked, writes a starter story script and puts it in the scene. See [Onboarding](/onboarding#create-episode). |
+| `Mindscape ▸ Story ▸ Create Missing Story Markers (All Episode Scenes)` | Adds a Story Marker for every position an episode works out in code (people at the door, the sofa seat, story cameras), at its built-in place, so it can be dragged in the Scene view. Episodes also have a button for this in their Inspector. |
+| `Mindscape ▸ House ▸ Refit Joey Bed Colliders (all scenes)` | Fits the bed's collision boxes to its meshes in every house scene, without moving the bed. |
+
+### Chapters (legacy builders)
+
+The chapter builders generated the episode scenes once. The scenes are now edited by hand, so a rebuild replaces those edits; every rebuild asks first (in batch mode it needs the `-mindscapeRebuild` flag).
+
+| Menu Path | What it does |
+| --- | --- |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 1 - Academic Pressure ▸ Build All Episodes` | Rebuilds the four Chapter 1 scenes. Each episode also has its own item (`Build Episode 1 - House` to `Build Episode 4 - Dormitory`). Save unrelated scene work first. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 1 - Academic Pressure ▸ Episode 4 - Add the Walk From the Cafeteria` | Adds the cafeteria start, the route to the dorm and the three studying roommates to the existing Episode 4 scene. Safe to re-run. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 1 - Academic Pressure ▸ Populate Episode 1 Street` | Rebuilds the Street Life NPCs, their sidewalk routes and the Nia and Hana conversation in the open house scene. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 1 - Academic Pressure ▸ Move Family Expectations to Chapter 2` | One-off move of the old family scenes into Chapter 2. |
+| `Mindscape ▸ Reveal Database File` | Shows the SQLite save file in the file manager. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Build All Episodes` | Rebuilds the five Chapter 2 scenes (per-episode items, and `Episode 4 - Update the Dinner Table`, are listed beside it). |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 2 - Family Expectations ▸ Episode 1 ▸ ...` | Bedroom layout, house NPCs, NPC wandering, cutscene slides and the courtroom for the original Episode 1. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 3 - Social Dynamics ▸ Build All Eight Episodes` | Generates the eight Chapter 3 scenes. |
+| `Mindscape ▸ Legacy Builders ▸ Chapter 3 - Social Dynamics ▸ Rebuild the Reunion Episodes (2-6)` | Rebuilds only the five reunion scenes. |
 | `Mindscape ▸ Chapter 3 - Social Dynamics ▸ Verify All Episodes (Play Mode)` | Runs every Chapter 3 story coroutine and reports to `Temp/SocialDynamicsVerification.txt`. |
 
 ### The shared city and its people

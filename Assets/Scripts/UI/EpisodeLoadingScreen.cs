@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -101,6 +102,18 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
 
     // The in-game shot of an episode (Mindscape > Main Menu > Capture Episode Thumbnails), shared with the main menu's
     // chapter and episode selector. Episode 0 is the tutorial.
+    /// <summary>The episode's picture as a texture: from the chapter asset for Chapter 4 and later, else Thumbnail().</summary>
+    public static Texture2D ThumbnailTexture(int chapter, int episode)
+    {
+        if (chapter >= Mindscape.Data.StoryChapters.FirstNumber)
+        {
+            var c = Mindscape.Data.StoryChapters.Get(chapter);
+            var e = Mindscape.Data.StoryChapters.Episode(chapter, episode);
+            return e != null ? e.Picture(c) : c != null ? c.thumbnail : null;
+        }
+        return Resources.Load<Texture2D>(Thumbnail(chapter, episode));
+    }
+
     public static string Thumbnail(int chapter, int episode)
     {
         int count = chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.EpisodeCount : chapter == 1 ? Mindscape.AcademicPressure.AcademicPressureChapter.EpisodeCount : EpisodeTitles.Length;
@@ -110,6 +123,8 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
     // chapter 1 = Academic Pressure, chapter 2 = Family Expectations; 0 infers it from the scene name.
     public static bool Load(string sceneName, int episodeNumber, int chapter = 0)
     {
+        // A scene listed in a chapter asset (Chapter 4 and later) knows its own chapter and episode.
+        if (Mindscape.Data.StoryChapters.Find(sceneName, out int storyChapter, out int storyEpisode)) { chapter = storyChapter; episodeNumber = storyEpisode; }
         if (chapter == 0) chapter = sceneName != null && sceneName.StartsWith("Chapter 3 ") ? 3 : sceneName != null && sceneName.StartsWith("Chapter 1 ") ? 1 : 2;
         if (active != null || string.IsNullOrEmpty(sceneName) || !Application.CanStreamedLevelBeLoaded(sceneName))
             return false;
@@ -119,7 +134,7 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
         instance.shownAt = Time.realtimeSinceStartup;
         DontDestroyOnLoad(instance.gameObject);
         instance.chapter = chapter;
-        instance.Build(Mathf.Clamp(episodeNumber, 1, chapter == 3 ? 8 : chapter == 1 ? Mindscape.AcademicPressure.AcademicPressureChapter.EpisodeCount : EpisodeTitles.Length) - 1);
+        instance.Build(Mathf.Clamp(episodeNumber, 1, chapter >= Mindscape.Data.StoryChapters.FirstNumber ? Mathf.Max(1, Mindscape.Data.MindscapeProgress.EpisodeCount(chapter)) : chapter == 3 ? 8 : chapter == 1 ? Mindscape.AcademicPressure.AcademicPressureChapter.EpisodeCount : EpisodeTitles.Length) - 1);
         instance.StartCoroutine(instance.LoadRoutine(sceneName));
         return true;
     }
@@ -152,10 +167,11 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
 
         // 3. Full-screen Artwork Backdrop
         bool academic = chapter == 1;
-        string[] locations = chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Locations : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Locations : Locations;
-        string[] titles = chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Titles : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Titles : EpisodeTitles;
-        string[] briefings = chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Briefings : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Briefings : QuestBriefings;
-        var tex = Resources.Load<Texture2D>(Thumbnail(chapter, index + 1));
+        var story = chapter >= Mindscape.Data.StoryChapters.FirstNumber ? Mindscape.Data.StoryChapters.Get(chapter) : null;
+        string[] locations = story != null ? story.episodes.Select(e => e.location ?? "").ToArray() : chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Locations : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Locations : Locations;
+        string[] titles = story != null ? story.episodes.Select(e => e.title ?? "").ToArray() : chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Titles : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Titles : EpisodeTitles;
+        string[] briefings = story != null ? story.episodes.Select(e => e.briefing ?? "").ToArray() : chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Briefings : academic ? Mindscape.AcademicPressure.AcademicPressureChapter.Briefings : QuestBriefings;
+        var tex = ThumbnailTexture(chapter, index + 1);
         backdrop = CreateImage("Artwork", transform, Color.white, tex);
         StretchFull(backdrop.rectTransform);
         backdrop.uvRect = CropToFill(tex);
@@ -195,7 +211,7 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
         brand.rectTransform.offsetMin = Vector2.zero;
         brand.rectTransform.offsetMax = Vector2.zero;
 
-        var chapterBadge = CreateText("Chapter Badge", topBar, chapter == 3 ? "CHAPTER 03  ·  SOCIAL DYNAMICS" : academic ? "CHAPTER 01  ·  ACADEMIC PRESSURE" : "CHAPTER 02  ·  FAMILY EXPECTATIONS", boldFont, 24, FontStyle.Bold, new Color(0.85f, 0.70f, 0.44f, 0.95f), TextAnchor.MiddleRight);
+        var chapterBadge = CreateText("Chapter Badge", topBar, story != null ? story.Badge : chapter == 3 ? "CHAPTER 03  ·  SOCIAL DYNAMICS" : academic ? "CHAPTER 01  ·  ACADEMIC PRESSURE" : "CHAPTER 02  ·  FAMILY EXPECTATIONS", boldFont, 24, FontStyle.Bold, new Color(0.85f, 0.70f, 0.44f, 0.95f), TextAnchor.MiddleRight);
         chapterBadge.rectTransform.anchorMin = new Vector2(0.5f, 0f);
         chapterBadge.rectTransform.anchorMax = new Vector2(1f, 1f);
         chapterBadge.rectTransform.offsetMin = Vector2.zero;
@@ -210,7 +226,7 @@ public sealed class EpisodeLoadingScreen : MonoBehaviour
         bottomArea.offsetMax = new Vector2(0f, 580f);
 
         // Episode Tag & Location
-        var locationTag = CreateText("Location Tag", bottomArea, "EPISODE " + (index + 1).ToString("00") + "  ·  " + locations[index], boldFont, 24, FontStyle.Bold, new Color(0.86f, 0.71f, 0.45f, 1f));
+        var locationTag = CreateText("Location Tag", bottomArea, "EPISODE " + (index + 1).ToString("00") + "  ·  " + (index < locations.Length ? locations[index] : ""), boldFont, 24, FontStyle.Bold, new Color(0.86f, 0.71f, 0.45f, 1f));
         SetAnchors(locationTag.rectTransform, 0f, 0f, 1f, 0f, new Vector2(0f, 536f), new Vector2(0f, 572f));
 
         // Episode Title

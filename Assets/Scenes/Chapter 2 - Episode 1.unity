@@ -9831,6 +9831,53 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1604791484203149188, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &358374528
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 358374529}
+  - component: {fileID: 358374530}
+  m_Layer: 0
+  m_Name: Family Tim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &358374529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358374528}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.2297524, z: -0, w: 0.97324914}
+  m_LocalPosition: {x: -24.281208, y: 0.5299889, z: 1.7937489}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1169064943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &358374530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 358374528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Family/Tim
+  kind: 0
+  note: Where Tim waits when you come home from school.
 --- !u!64 &359537077
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -29080,6 +29127,7 @@ Transform:
   - {fileID: 1513402365}
   - {fileID: 1975233279}
   - {fileID: 1716473558}
+  - {fileID: 1169064943}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &966575687
@@ -34700,6 +34748,39 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -1669434228607256596, guid: 446a45f0a51d44268afd65134608fec6, type: 3}
+--- !u!1 &1169064942
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1169064943}
+  m_Layer: 0
+  m_Name: Story Markers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1169064943
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1169064942}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1605603079}
+  - {fileID: 358374529}
+  m_Father: {fileID: 966575686}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!64 &1169911013
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -48339,6 +48420,53 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &1605603078
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1605603079}
+  - component: {fileID: 1605603080}
+  m_Layer: 0
+  m_Name: Family Mom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1605603079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1605603078}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.04335512, z: -0, w: 0.99905974}
+  m_LocalPosition: {x: -22.481209, y: 0.5299888, z: 1.5937495}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1169064943}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1605603080
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1605603078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Family/Mom
+  kind: 0
+  note: Where Mom waits when you come home from school.
 --- !u!65 &1610396273
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52833,8 +52961,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4392354, y: 0.19923553, z: 2.0592346}
-  m_Center: {x: 0, y: 0.22000004, z: 1.067348e-15}
+  m_Size: {x: 1.4392354, y: 2.059235, z: 0.19923556}
+  m_Center: {x: 0, y: 0, z: 0.22000003}
 --- !u!65 &1760213293
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52854,8 +52982,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3395177, y: 0.21945839, z: 1.8995175}
-  m_Center: {x: 0, y: 0.42999998, z: 2.0861799e-15}
+  m_Size: {x: 1.3395177, y: 1.8995179, z: 0.21945843}
+  m_Center: {x: 0, y: 0, z: 0.43}
 --- !u!65 &1760213294
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52875,8 +53003,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4396725, y: 0.65967214, z: 0.0796722}
-  m_Center: {x: 0, y: 0.42999998, z: 0.9999998}
+  m_Size: {x: 1.4396725, y: 0.07967222, z: 0.65967226}
+  m_Center: {x: 0, y: -1, z: 0.43}
 --- !u!65 &1760213295
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52896,8 +53024,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4397135, y: 0.3397132, z: 0.0697134}
-  m_Center: {x: 0.000000029802322, y: 0.26999998, z: -0.99999994}
+  m_Size: {x: 1.4397135, y: 0.06971341, z: 0.33971325}
+  m_Center: {x: 0.000000029802322, y: 1.0000001, z: 0.26999998}
 --- !u!1 &1761025163
 GameObject:
   m_ObjectHideFlags: 0
@@ -54313,6 +54441,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: 9a373c191fe7b41de9fe1a02d6510e9e, type: 2}
   moveSpeed: 7
   rotationSpeed: 12
   gravity: -20

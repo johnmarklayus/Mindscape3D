@@ -74,6 +74,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Chapter 3 - Episode 8.unity
     guid: a5a607eb434234dcb8d5672a4275defa
+  - enabled: 1
+    path: Assets/Scenes/Chapter 3 - Episode 10.unity
+    guid: 6f8e451818de64d0d8e87043219a6947
   m_configObjects:
     com.unity.adaptivePerformance.basic.provider_settings: {fileID: 11400000, guid: 58955483786dd47bba31c8cab8d02a62, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 3dfdba79c2b05437da148f1de263db53, type: 2}

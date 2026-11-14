@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UIE = UnityEngine.UIElements;
 using static UnityEngine.UIElements.UQueryExtensions;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.FamilyExpectations
 {
@@ -57,28 +58,28 @@ namespace Mindscape.FamilyExpectations
             for (int i = 0; i < 3; i++)
             {
                 int index = i;
-                AddSpot(Target(i), "Examine the " + Titles[i].ToLowerInvariant(), () => inRoom && !Seen(index), () => Memory(index));
+                AddSpot(Target(i), W("Examine the ") + Titles[i].ToLowerInvariant(), () => inRoom && !Seen(index), () => Memory(index));
             }
-            AddSpot(paper, "Pick up the paper  ·  remember the morning", () => SeenMask == 7 && !ended, Ending);
+            AddSpot(paper, W("Pick up the paper  ·  remember the morning"), () => SeenMask == 7 && !ended, Ending);
 
             // Home from school: the bus ride, the walk up to the house, and Mom at the door asking about the examination.
             yield return ComeHome();
 
             // In through the bedroom door (it opens with its own [ E ]), on foot.
-            AddArrival(bedroomSpawn, "Go to your room", () => !inRoom, EnterRoom);
-            SetObjective("Go to your room", Check(true, "Home") + Check(false, "To your bedroom"));
+            AddArrival(bedroomSpawn, W("Go to your room"), () => !inRoom, EnterRoom);
+            SetObjective(W("Go to your room"), Check(true, W("Home")) + Check(false, W("To your bedroom")));
             yield return RoamUntil(() => inRoom);
 
             yield return RoamUntil(() =>
             {
-                SetObjective("Examine the things from today", Check(Seen(0), Titles[0] + "  ·  on the desk") + Check(Seen(1), Titles[1] + "  ·  on the bed") + Check(Seen(2), Titles[2] + "  ·  on the desk"));
+                SetObjective(W("Examine the things from today"), Check(Seen(0), Titles[0] + W("  ·  on the desk")) + Check(Seen(1), Titles[1] + W("  ·  on the bed")) + Check(Seen(2), Titles[2] + W("  ·  on the desk")));
                 return SeenMask == 7;
             });
-            SetObjective("Return to the examination paper", Check(true, "3 memories") + Check(false, "The paper on your desk"));
+            SetObjective(W("Return to the examination paper"), Check(true, W("3 memories")) + Check(false, W("The paper on your desk")));
             yield return RoamUntil(() => ended);
 
-            Complete("The paper on the desk",
-                "The clock becomes an alarm.\nThe memory takes you back to the morning of the examination.\n\n3 memories examined. Your thought journal keeps them.");
+            Complete(W("The paper on the desk"),
+                W("The clock becomes an alarm.\nThe memory takes you back to the morning of the examination.\n\n3 memories examined. Your thought journal keeps them."));
         }
 
         // ---------------------------------------------------------------- coming home
@@ -86,16 +87,41 @@ namespace Mindscape.FamilyExpectations
         bool walkedUp, greeted;
         Transform mom, tim;
 
+        // The front door: the floor height inside it, the point in the doorway and the way into the house.
+        float DoorLayout(out Vector3 entry, out Vector3 inward)
+        {
+            HomeWelcome.FrontDoor(bedroomSpawn.position, out var door, out inward);
+            float floorY = bedroomSpawn.position.y - .1f;
+            if (Physics.Raycast(new Vector3(door.x, door.y + 3, door.z) + inward * 2.2f, Vector3.down, out var floorHit, 8, ~0, QueryTriggerInteraction.Ignore)) floorY = floorHit.point.y;
+            entry = new Vector3(door.x, floorY, door.z);
+            return floorY;
+        }
+
+        // Built in: Mom and Tim wait just inside the front door, facing it.
+        static System.Collections.Generic.IEnumerable<StoryMarkerDefault> FamilyDefaults(Vector3 entry, Vector3 inward, float floorY)
+        {
+            Vector3 side = Vector3.Cross(Vector3.up, inward);
+            var mom = HomeWelcome.ClearFloor(entry + inward * 4.6f + side * .4f, floorY);
+            var tim = HomeWelcome.ClearFloor(entry + inward * 4.4f + side * 2.2f, floorY);
+            yield return new StoryMarkerDefault("Family/Mom", StoryMarkerKind.Person, mom, entry - mom, "Where Mom waits when you come home from school.");
+            yield return new StoryMarkerDefault("Family/Tim", StoryMarkerKind.Person, tim, entry - tim, "Where Tim waits when you come home from school.");
+        }
+
+        public override System.Collections.Generic.IEnumerable<StoryMarkerDefault> MarkerDefaults()
+        {
+            if (bedroomSpawn == null) yield break;
+            float floorY = DoorLayout(out var entry, out var inward);
+            foreach (var d in FamilyDefaults(entry, inward, floorY)) yield return d;
+        }
+
         IEnumerator ComeHome()
         {
             // Mom (and Tim) wait just inside the front door, out of sight from the street.
+            // Their places can be moved in the scene with StoryMarkers "Family/Mom" and "Family/Tim".
             mom = HomeWelcome.FindPerson("Mom", "Mother"); tim = HomeWelcome.FindPerson("Tim");
-            HomeWelcome.FrontDoor(bedroomSpawn.position, out var door, out var inward);
-            float floorY = bedroomSpawn.position.y - .1f;
-            if (Physics.Raycast(new Vector3(door.x, door.y + 3, door.z) + inward * 2.2f, Vector3.down, out var floorHit, 8, ~0, QueryTriggerInteraction.Ignore)) floorY = floorHit.point.y;
-            Vector3 entry = new Vector3(door.x, floorY, door.z), side = Vector3.Cross(Vector3.up, inward);
-            if (mom != null) HomeWelcome.Place(mom, HomeWelcome.ClearFloor(entry + inward * 4.6f + side * .4f, floorY), entry);
-            if (tim != null) HomeWelcome.Place(tim, HomeWelcome.ClearFloor(entry + inward * 4.4f + side * 2.2f, floorY), entry);
+            float floorY = DoorLayout(out var entry, out var inward);
+            foreach (var d in FamilyDefaults(entry, inward, floorY))
+                PlaceMarked(d.id, d.id == "Family/Mom" ? mom : tim, d.position, entry);
             var inside = Waypoint("Just inside the front door", entry + inward * 2.2f + Vector3.up * .1f);
 
             PlayerBackpack.Wear(player, true);   // home from school with the bag on, until it is dropped in the bedroom
@@ -109,10 +135,10 @@ namespace Mindscape.FamilyExpectations
                 Vector3 side2 = Vector3.Cross(Vector3.up, ride.heading);
                 bool arrived = false;
                 StartCoroutine(Drive(-70, 0, 9f, () => arrived = true, side2));
-                yield return Card(TitleCard, "Begin  [Space]");
+                yield return Card(TitleCard, W("Begin  [Space]"));
                 yield return DialogueSequence(
-                    Think("The bus ride home feels longer than usual."),
-                    Think("The examination is over, but I keep going over every question in my head."));
+                    Think(W("The bus ride home feels longer than usual.")),
+                    Think(W("The examination is over, but I keep going over every question in my head.")));
                 while (!arrived) yield return null;
                 // Off at the kerb; the bus pulls away.
                 Vector3 kerb = ride.kerb;
@@ -129,17 +155,17 @@ namespace Mindscape.FamilyExpectations
             {
                 Teleport(outsideStart.position, outsideStart.eulerAngles.y);
                 Shot(outsideStart.position + new Vector3(2.6f, 4.2f, 4.5f), outsideEnd.position + Vector3.up * 2.2f);
-                yield return Card(TitleCard, "Begin  [Space]");
+                yield return Card(TitleCard, W("Begin  [Space]"));
             }
-            yield return Say("After school", "The examination is over, but the worry has followed you home.");
+            yield return Say(W("After school"), W("The examination is over, but the worry has followed you home."));
             AddStress(10);
 
             // The walk home, then in through the front door (it opens with its own [ E ]).
-            AddArrival(outsideStart, "Walk home", () => !walkedUp, () => { walkedUp = true; return Nothing(); }, 3f);
-            AddArrival(inside, "Go inside", () => !greeted, () => Greeting(inward), 2f);
-            SetObjective("Walk home", Check(false, "Up the path to your front door"));
+            AddArrival(outsideStart, W("Walk home"), () => !walkedUp, () => { walkedUp = true; return Nothing(); }, 3f);
+            AddArrival(inside, W("Go inside"), () => !greeted, () => Greeting(inward), 2f);
+            SetObjective(W("Walk home"), Check(false, W("Up the path to your front door")));
             yield return RoamUntil(() => walkedUp || greeted);
-            if (!greeted) SetObjective("Go inside", Check(true, "Front door") + Check(false, "Open the door and go in"));
+            if (!greeted) SetObjective(W("Go inside"), Check(true, W("Front door")) + Check(false, W("Open the door and go in")));
             yield return RoamUntil(() => greeted);
 
             IEnumerator Drive(float from, float to, float seconds, System.Action done, Vector3 side3, bool follow = true)
@@ -173,13 +199,13 @@ namespace Mindscape.FamilyExpectations
             yield return new WaitForSeconds(1.2f);
             if (mom != null) StartCoroutine(HomeWelcome.TurnTo(mom, player.position, .3f));
             yield return DialogueSequence(
-                Line(tim, "Tim", "You're back!"),
-                Line(mom, "Mom", PlayerName + ", you're home! How did the examination go?"),
-                Line(null, null, "I'm not sure yet, Mom. I arrived late, so I didn't get to answer everything."),
-                Line(mom, "Mom", "Late? What happened this morning?"),
-                Line(null, null, "Can I tell you later? I just want to rest for a bit."),
-                Line(mom, "Mom", "All right. Go and change, then rest. We can talk at dinner."),
-                BeforeDialogue(null, Think("She only asked how it went. So why does it feel so heavy?")));
+                Line(tim, W("Tim"), W("You're back!")),
+                Line(mom, W("Mom"), PlayerName + W(", you're home! How did the examination go?")),
+                Line(null, null, W("I'm not sure yet, Mom. I arrived late, so I didn't get to answer everything.")),
+                Line(mom, W("Mom"), W("Late? What happened this morning?")),
+                Line(null, null, W("Can I tell you later? I just want to rest for a bit.")),
+                Line(mom, W("Mom"), W("All right. Go and change, then rest. We can talk at dinner.")),
+                BeforeDialogue(null, Think(W("She only asked how it went. So why does it feel so heavy?"))));
             foreach (var f in new[] { mom, tim }) HomeWelcome.Play(f, "Idle");
             Teleport(player.position, yawIn);   // the follow camera comes back behind you, inside
 
@@ -224,9 +250,9 @@ namespace Mindscape.FamilyExpectations
             PutBagOnBed();
             Shot(bedroomView.position, paper.position);
             yield return DialogueSequence(
-                Think("It's finally over. I should be relieved, but I still feel worried."),
-                Think("I studied for this exam. I stayed up late because I didn't want to fail.\nBut I arrived after everyone had started."),
-                Think("What if I made mistakes because I was rushing?\nI don't know my result yet, but I'm already imagining the worst."));
+                Think(W("It's finally over. I should be relieved, but I still feel worried.")),
+                Think(W("I studied for this exam. I stayed up late because I didn't want to fail.\nBut I arrived after everyone had started.")),
+                Think(W("What if I made mistakes because I was rushing?\nI don't know my result yet, but I'm already imagining the worst.")));
             inRoom = true;
         }
 
@@ -244,9 +270,9 @@ namespace Mindscape.FamilyExpectations
             var target = Target(i);
             ShotOver(target, 2f, 1.4f);
             yield return DialogueSequence(
-                Say("Memory  /  " + Titles[i], Thoughts[i], () => AddStress(8)),
+                Say(W("Memory  /  ") + Titles[i], Thoughts[i], () => AddStress(8)),
                 RecallMemory(),
-                Think("I'll put it in my journal. Seeing it written down makes it a little smaller."));
+                Think(W("I'll put it in my journal. Seeing it written down makes it a little smaller.")));
             // Writing it down helps a little.
             EaseStress(4);
             SeenMask |= 1 << i;
@@ -257,19 +283,19 @@ namespace Mindscape.FamilyExpectations
             {
                 if (i == 0 && examMemoryView != null)
                 {
-                    yield return FlashbackIn("Earlier today  ·  the examination", () => Shot(examMemoryView.position, examMemoryView.position + examMemoryView.forward * 6), .35f);
-                    yield return Say("Earlier  /  the examination", Afterthoughts[0]);
+                    yield return FlashbackIn(W("Earlier today  ·  the examination"), () => Shot(examMemoryView.position, examMemoryView.position + examMemoryView.forward * 6), .35f);
+                    yield return Say(W("Earlier  /  the examination"), Afterthoughts[0]);
                     yield return FlashbackOut(() => ShotOver(target, 2f, 1.4f), .35f);
                 }
                 else
                 {
                     float sunWas = sun != null ? sun.intensity : 0, lampWas = deskLight != null ? deskLight.intensity : 0;
-                    yield return FlashbackIn(i == 2 ? "The night before" : "Examination morning", () =>
+                    yield return FlashbackIn(i == 2 ? W("The night before") : W("Examination morning"), () =>
                     {
                         if (i == 2) { if (deskLight != null) deskLight.intensity = 4; if (sun != null) sun.intensity = .08f; }
                         if (i == 1 && morningItems != null) morningItems.SetActive(true);
                     }, .35f);
-                    yield return Say(i == 2 ? "The night before  /  one more lesson" : "Examination morning  /  already late", Afterthoughts[i]);
+                    yield return Say(i == 2 ? W("The night before  /  one more lesson") : W("Examination morning  /  already late"), Afterthoughts[i]);
                     yield return FlashbackOut(() =>
                     {
                         if (sun != null) sun.intensity = sunWas;
@@ -284,8 +310,8 @@ namespace Mindscape.FamilyExpectations
         {
             ShotOver(paper, 1.6f, 1.3f);
             yield return DialogueSequence(
-                Think("Maybe if I had done things differently, the examination would have gone better."),
-                Think("If I had slept earlier. Packed my bag. Left sooner..."));
+                Think(W("Maybe if I had done things differently, the examination would have gone better.")),
+                Think(W("If I had slept earlier. Packed my bag. Left sooner...")));
             AddStress(10);
             yield return Fade(0, 1, 2);
             effects.PlayOneShot(Tone("Morning alarm", 760, 1.6f, true), .23f);

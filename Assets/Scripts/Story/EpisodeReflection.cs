@@ -11,17 +11,19 @@ namespace Mindscape.AcademicPressure
 
         // Two episodes keep the prompt their story leads into; every other episode uses the default.
         public static string Prompt(int chapter, int episode) =>
+            chapter >= Mindscape.Data.StoryChapters.FirstNumber && !string.IsNullOrWhiteSpace(Mindscape.Data.StoryChapters.Get(chapter)?.journalPrompt) ? Mindscape.Data.StoryChapters.Get(chapter).journalPrompt :
             chapter == 1 && episode == 4 ? DormitoryEpisode.JournalPrompt :
             chapter == 3 && episode == 6 ? "What is one thing you appreciate about yourself?" :
             DefaultPrompt;
 
-        public static string ChapterName(int chapter) => chapter >= 1 && chapter <= ChapterNames.Length ? ChapterNames[chapter - 1] : "";
+        public static string ChapterName(int chapter) => chapter >= 1 && chapter <= ChapterNames.Length ? ChapterNames[chapter - 1] : Mindscape.Data.StoryChapters.Get(chapter)?.title ?? "";
 
         public static string Title(int chapter, int episode)
         {
             string[] titles = chapter == 1 ? AcademicPressureChapter.Titles
                 : chapter == 2 ? Mindscape.FamilyExpectations.FamilyExpectationsChapter.Titles
                 : chapter == 3 ? Mindscape.SocialDynamics.SocialDynamicsChapter.Titles : null;
+            if (titles == null) return Mindscape.Data.StoryChapters.Episode(chapter, episode)?.title ?? "";
             return titles != null && episode >= 1 && episode <= titles.Length ? titles[episode - 1] : "";
         }
 

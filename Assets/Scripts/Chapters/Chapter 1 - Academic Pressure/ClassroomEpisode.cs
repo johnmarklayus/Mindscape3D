@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.AcademicPressure
 {
@@ -25,9 +26,9 @@ namespace Mindscape.AcademicPressure
         {
             // Room 03's door opens with its own [ E ]; walking in past it is what enters the classroom.
             AddArrival(landing != null ? landing : Waypoint("Inside Room 03", entrance.position + Vector3.ProjectOnPlane(seat.position - entrance.position, Vector3.up).normalized * 2.2f),
-                "Walk into your classroom", () => !inside, EnterClassroom, 2.2f);
-            AddSpot(seat, "Take your seat", () => inside && !seated, TakeSeat);
-            AddSpot(friend, "Talk to " + friendName, () => seated && !talked, TalkToFriend, 3.6f);
+                W("Walk into your classroom"), () => !inside, EnterClassroom, 2.2f);
+            AddSpot(seat, W("Take your seat"), () => inside && !seated, TakeSeat);
+            AddSpot(friend, W("Talk to ") + friendName, () => seated && !talked, TalkToFriend, 3.6f);
 
             if (routeMarkers != null) routeMarkers.SetActive(false);
             // The bag beside your desk is the one you carry in: it only appears there once you have sat down.
@@ -35,7 +36,7 @@ namespace Mindscape.AcademicPressure
             if (deskBag != null) deskBag.gameObject.SetActive(false);
             if (openingView != null) Shot(openingView.position, openingView.position + openingView.forward * 10);
             player.gameObject.SetActive(false);
-            yield return Card("Episode 02  ·  The Announcement", "Begin  [Space]");
+            yield return Card(W("Episode 02  ·  The Announcement"), W("Begin  [Space]"));
             // The bus pulls in at the stop outside the school gate.
             if (bus != null)
             {
@@ -52,23 +53,23 @@ namespace Mindscape.AcademicPressure
             Shot(HomeWelcome.ClearView(spawn.position + Vector3.up * 2, spawn.position + spawn.right * 5 - spawn.forward * .5f + Vector3.up * 3), spawn.position + spawn.forward * 8 + Vector3.up * 1.5f);   // in front of the gate pillars
             yield return Fade(1, 0, .3f);
             if (bus != null) StartCoroutine(DriveOff());
-            yield return Think("School. The gate is open and the yard is already busy.\nRoom 03 is across the yard, along the corridor.");
+            yield return Think(W("School. The gate is open and the yard is already busy.\nRoom 03 is across the yard, along the corridor."));
             if (routeMarkers != null) routeMarkers.SetActive(true);
 
-            SetObjective("Go to your classroom", Check(false, "Room 03, across the yard  ·  hold Shift to run"));
+            SetObjective(W("Go to your classroom"), Check(false, W("Room 03, across the yard  ·  hold Shift to run")));
             yield return RoamUntil(() => inside);
-            SetObjective("Find your seat", Check(true, "Room 03") + Check(false, "Your seat"));
+            SetObjective(W("Find your seat"), Check(true, W("Room 03")) + Check(false, W("Your seat")));
             yield return RoamUntil(() => seated);
             if (!talked)
             {
-                SetObjective("Talk to your friend", Check(false, friendName + " is by the desks"));
+                SetObjective(W("Talk to your friend"), Check(false, friendName + W(" is by the desks")));
                 yield return RoamUntil(() => talked);
             }
 
-            Complete("The announcement",
-                "The deadline was announced, and someone else is almost done.\n\n" +
-                "You talked with " + friendName + " and " + (Recall(AcademicPressureChapter.Breathing) == "completed" ? "took a full breathing break." : "paused for a breath.") +
-                "\n\nYour choices are saved.");
+            Complete(W("The announcement"),
+                W("The deadline was announced, and someone else is almost done.\n\n") +
+                W("You talked with ") + friendName + W(" and ") + (Recall(AcademicPressureChapter.Breathing) == "completed" ? W("took a full breathing break.") : W("paused for a breath.")) +
+                W("\n\nYour choices are saved."));
         }
 
         IEnumerator DriveOff()
@@ -80,7 +81,7 @@ namespace Mindscape.AcademicPressure
         IEnumerator EnterClassroom()
         {
             if (routeMarkers != null) routeMarkers.SetActive(false);
-            yield return Think("Everyone is already talking about their projects.");
+            yield return Think(W("Everyone is already talking about their projects."));
             inside = true;
         }
 
@@ -98,17 +99,17 @@ namespace Mindscape.AcademicPressure
 
             if (teacher != null) yield return Glide(seatView.position, teacher.position + Vector3.up * 2.3f, 1.2f);
             yield return DialogueSequence(
-                Say("Teacher", "Remember that your project presentation is tomorrow. Make sure your work is ready."),
-                Me("Tomorrow...", () => AddStress(12)),
+                Say(W("Teacher"), W("Remember that your project presentation is tomorrow. Make sure your work is ready.")),
+                Me(W("Tomorrow..."), () => AddStress(12)),
                 BeforeDialogue(classmate != null ? Glide(seatView.position, classmate.position + Vector3.up * 1.4f, 1f) : null,
-                    Say("Classmate", "I'm almost finished with mine. I just need to polish a few things.")),
-                Think("They're already finished...", () => AddStress(10)),
+                    Say(W("Classmate"), W("I'm almost finished with mine. I just need to polish a few things."))),
+                Think(W("They're already finished..."), () => AddStress(10)),
                 // The morning's decision returns as a small change in the inner voice.
                 Think(Recall(AcademicPressureChapter.LaptopPlan) == "one_task"
-                    ? "This morning I said I'd start with one part. I haven't started it yet."
-                    : "This morning I told myself I'd finish everything tonight. Everything."),
+                    ? W("This morning I said I'd start with one part. I haven't started it yet.")
+                    : W("This morning I told myself I'd finish everything tonight. Everything.")),
                 BeforeDialogue(teacher != null ? Glide(seatView.position, teacher.position + Vector3.up * 2.3f, 1f) : null,
-                    Say("Teacher", "That's all for this morning. Use your free period well.")));
+                    Say(W("Teacher"), W("That's all for this morning. Use your free period well."))));
 
             // Still in your seat: turn to Sam beside you and talk, then stand up.
             if (sitting)
@@ -160,31 +161,31 @@ namespace Mindscape.AcademicPressure
         IEnumerator TalkToFriend()
         {
             FriendShot();
-            yield return Say(friendName, "You look worried. Everything okay?");
+            yield return Say(friendName, W("You look worried. Everything okay?"));
             int reply = 0;
-            yield return Choose(friendName, "What do you say?", new[]
+            yield return Choose(friendName, W("What do you say?"), new[]
             {
-                "\"I'm fine.\"",
-                "\"I'm having a hard time keeping up.\"",
-                "\"I don't know if I can finish everything.\""
+                W("\"I'm fine.\""),
+                W("\"I'm having a hard time keeping up.\""),
+                W("\"I don't know if I can finish everything.\"")
             }, i => reply = i);
             Record(AcademicPressureChapter.FriendReply, reply == 0 ? "fine" : reply == 1 ? "hard_time" : "cannot_finish");
             EaseStress(reply == 0 ? 2 : 6);   // saying it out loud
-            if (reply == 0) yield return Say(friendName, "Okay. But if you need help, just let me know.");
-            else if (reply == 1) yield return Say(friendName, "You don't have to finish everything at once. What part are you working on?");
-            else yield return Say(friendName, "Take it one step at a time. You can start with the part you understand.");
+            if (reply == 0) yield return Say(friendName, W("Okay. But if you need help, just let me know."));
+            else if (reply == 1) yield return Say(friendName, W("You don't have to finish everything at once. What part are you working on?"));
+            else yield return Say(friendName, W("Take it one step at a time. You can start with the part you understand."));
 
             // The three replies converge here.
-            yield return Card(PlayerName + " feels overwhelmed.", "Continue  [Space]");
-            yield return Card("Take a moment.", "Continue  [Space]");
+            yield return Card(PlayerName + W(" feels overwhelmed."), W("Continue  [Space]"));
+            yield return Card(W("Take a moment."), W("Continue  [Space]"));
             FriendShot();
-            yield return Say(friendName, "Let's slow down for a moment. Take a breath.");
+            yield return Say(friendName, W("Let's slow down for a moment. Take a breath."));
             bool completed = false;
             yield return Breathe(done => completed = done);
             Record(AcademicPressureChapter.Breathing, completed ? "completed" : "closed_early");
             yield return DialogueSequence(
-                completed ? Me("I feel a little calmer.") : Me("A little slower. I can come back to the breath whenever I need it."),
-                Say(friendName, "Let's get lunch later. The cafeteria fills up fast."));
+                completed ? Me(W("I feel a little calmer.")) : Me(W("A little slower. I can come back to the breath whenever I need it.")),
+                Say(friendName, W("Let's get lunch later. The cafeteria fills up fast.")));
             talked = true;
         }
     }

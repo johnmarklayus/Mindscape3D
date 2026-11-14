@@ -18,7 +18,7 @@ using Object = UnityEngine.Object;
 // Every step is safe to re-run: generated scenes are rebuilt from their sources, the move happens once.
 public static partial class AcademicPressureBuilder
 {
-    const string Menu = "Mindscape/Chapter 1 - Academic Pressure/";
+    const string Menu = LegacyBuilders.Root + "Chapter 1 - Academic Pressure/";
     const string MaterialFolder = "Assets/AcademicPressure/Materials";
     static readonly string[] FamilyRoots = { "Episode 1 - Family Expectations", "Episode 2 - Before the Bell", "Episode 3 - Running Out of Time" };
     static string ScenePath(int episode) => "Assets/Scenes/" + AcademicPressureChapter.Scenes[episode - 1] + ".unity";
@@ -48,7 +48,7 @@ public static partial class AcademicPressureBuilder
     [MenuItem(Menu + "Move Family Expectations to Chapter 2", priority = 40)]
     public static void MenuMoveFamily() { if (Prepare()) { MoveFamilyToChapterTwo(); RegisterScenes(); } }
 
-    [MenuItem(Menu + "Reveal Database File", priority = 60)]
+    [MenuItem("Mindscape/Reveal Database File", priority = 900)]
     public static void RevealDatabase()
     {
         Debug.Log("Mindscape database: " + Mindscape.Data.MindscapeDatabase.StorageDescription);
@@ -66,6 +66,7 @@ public static partial class AcademicPressureBuilder
     static bool Prepare()
     {
         if (EditorApplication.isPlaying) throw new InvalidOperationException("Exit Play mode before building.");
+        if (!LegacyBuilders.ConfirmRebuild("the Chapter 1 / Chapter 2 episode scenes")) return false;
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return false;
         // Leave every scene closed so files can move safely.
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);

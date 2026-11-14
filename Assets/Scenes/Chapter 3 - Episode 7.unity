@@ -2929,6 +2929,53 @@ MonoBehaviour:
   leafSize: {x: 1, y: 2.1}
   highlightColor: {r: 1, g: 0.85, b: 0.3, a: 1}
   highlightIntensity: 0.4
+--- !u!1 &150659623
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 150659624}
+  - component: {fileID: 150659625}
+  m_Layer: 0
+  m_Name: Family Tim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &150659624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150659623}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.31622732, z: -0, w: 0.94868344}
+  m_LocalPosition: {x: -25.081207, y: 0.52998894, z: 2.19375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1260371370}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &150659625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 150659623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Family/Tim
+  kind: 0
+  note: Where they wait for you inside the front door (Episode 7).
 --- !u!1 &169518359 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 774294533375193040, guid: bf9ea1e3e29f3499b94882a8a7636005, type: 3}
@@ -5309,6 +5356,53 @@ Transform:
   - {fileID: 2033025206}
   m_Father: {fileID: 295162668}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &383295014
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 383295015}
+  - component: {fileID: 383295016}
+  m_Layer: 0
+  m_Name: Welcome Mom step
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &383295015
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383295014}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.22975293, z: -0, w: 0.973249}
+  m_LocalPosition: {x: -23.581213, y: 0.5299895, z: 3.19375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1260371370}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &383295016
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383295014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Welcome/Mom step
+  kind: 0
+  note: Where they step to when you come in (Episode 7).
 --- !u!1001 &390917716
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6225,6 +6319,53 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 427829366}
   m_Enabled: 1
+--- !u!1 &434383133
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 434383134}
+  - component: {fileID: 434383135}
+  m_Layer: 0
+  m_Name: Family Mom
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &434383134
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 434383133}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.16658777, z: -0, w: 0.98602664}
+  m_LocalPosition: {x: -23.68121, y: 0.5299888, z: 1.5937495}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1260371370}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &434383135
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 434383133}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Family/Mom
+  kind: 0
+  note: Where they wait for you inside the front door (Episode 7).
 --- !u!1 &439685047 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7375966625945004749, guid: bf9ea1e3e29f3499b94882a8a7636005, type: 3}
@@ -6882,6 +7023,53 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -7434797016180043590, guid: bf9ea1e3e29f3499b94882a8a7636005, type: 3}
+--- !u!1 &565090586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 565090587}
+  - component: {fileID: 565090588}
+  m_Layer: 0
+  m_Name: Welcome Tim step
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &565090587
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565090586}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.3913812, z: -0, w: 0.92022866}
+  m_LocalPosition: {x: -24.781214, y: 0.5299895, z: 3.59375}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1260371370}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &565090588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565090586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Welcome/Tim step
+  kind: 0
+  note: Where they step to when you come in (Episode 7).
 --- !u!1 &568002856
 GameObject:
   m_ObjectHideFlags: 0
@@ -15403,6 +15591,7 @@ Transform:
   - {fileID: 1282503457}
   - {fileID: 916089273}
   - {fileID: 665971827}
+  - {fileID: 1260371370}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1167593623
@@ -16866,6 +17055,42 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7042177031842107389, guid: 4f8c4d1d091eb49839d180bdd31e53be, type: 3}
   m_PrefabInstance: {fileID: 1253775700}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1260371369
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1260371370}
+  m_Layer: 0
+  m_Name: Story Markers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1260371370
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1260371369}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 434383134}
+  - {fileID: 1289166805}
+  - {fileID: 150659624}
+  - {fileID: 383295015}
+  - {fileID: 565090587}
+  m_Father: {fileID: 1166129377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1262272307 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3384500500772179274, guid: bf9ea1e3e29f3499b94882a8a7636005, type: 3}
@@ -17346,6 +17571,53 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1166129377}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1289166804
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1289166805}
+  - component: {fileID: 1289166806}
+  m_Layer: 0
+  m_Name: Family Dad
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1289166805
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289166804}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.20759116, z: -0, w: 0.9782157}
+  m_LocalPosition: {x: -24.481209, y: 0.5299887, z: 0.7937498}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1260371370}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1289166806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1289166804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 947cc9a89914f48a7998dd5dd1a1a17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Mindscape.AcademicPressure.StoryMarker
+  id: Family/Dad
+  kind: 0
+  note: Where they wait for you inside the front door (Episode 7).
 --- !u!1001 &1295985334
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23326,8 +23598,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4392354, y: 0.19923553, z: 2.0592346}
-  m_Center: {x: 0, y: 0.22000004, z: 1.067348e-15}
+  m_Size: {x: 1.4392354, y: 2.059235, z: 0.19923556}
+  m_Center: {x: 0, y: 0, z: 0.22000003}
 --- !u!65 &1751755805
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23347,8 +23619,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.3395177, y: 0.21945839, z: 1.8995175}
-  m_Center: {x: 0, y: 0.42999998, z: 2.0861799e-15}
+  m_Size: {x: 1.3395177, y: 1.8995179, z: 0.21945843}
+  m_Center: {x: 0, y: 0, z: 0.43}
 --- !u!65 &1751755806
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23368,8 +23640,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4396725, y: 0.65967214, z: 0.0796722}
-  m_Center: {x: 0, y: 0.42999998, z: 0.9999998}
+  m_Size: {x: 1.4396725, y: 0.07967222, z: 0.65967226}
+  m_Center: {x: 0, y: -1, z: 0.43}
 --- !u!65 &1751755807
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23389,8 +23661,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4397135, y: 0.3397132, z: 0.0697134}
-  m_Center: {x: 0.000000029802322, y: 0.26999998, z: -0.99999994}
+  m_Size: {x: 1.4397135, y: 0.06971341, z: 0.33971325}
+  m_Center: {x: 0.000000029802322, y: 1.0000001, z: 0.26999998}
 --- !u!1 &1753476599 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 3201576312778959090, guid: bf9ea1e3e29f3499b94882a8a7636005, type: 3}
@@ -24029,6 +24301,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94c6812f059704fca87b579b0ac79d95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  settings: {fileID: 11400000, guid: d54046ae90ce64c1996dc349197c2433, type: 2}
   moveSpeed: 7
   rotationSpeed: 12
   gravity: -20

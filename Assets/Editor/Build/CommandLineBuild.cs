@@ -27,7 +27,7 @@ public static class CommandLineBuild
         try
         {
             string output = Argument("-mindscapeOutput") ?? fallbackOutput;
-            string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).Select(s => s.path).ToArray();
+            string[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled && File.Exists(s.path)).Select(s => s.path).ToArray();
             if (scenes.Length == 0) throw new InvalidOperationException("No scenes are enabled in File > Build Profiles.");
             if (EditorUserBuildSettings.activeBuildTarget != target && !EditorUserBuildSettings.SwitchActiveBuildTarget(group, target))
                 throw new InvalidOperationException("Could not switch to " + target + ". Is its Build Support module installed in Unity Hub?");

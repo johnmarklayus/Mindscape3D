@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Mindscape.AcademicPressure;
 using UnityEngine;
+using static Mindscape.AcademicPressure.StoryWords;
 
 namespace Mindscape.FamilyFinale
 {
@@ -53,7 +54,7 @@ namespace Mindscape.FamilyFinale
             player.gameObject.SetActive(true);
             AddStress(index == 0 ? -4 : 4);
             SeenMask |= 1 << index;
-            SetObjective("Remembering the past", Check((SeenMask & 1) != 0, KeepsakeNames[0]) + Check((SeenMask & 2) != 0, KeepsakeNames[1]) + Check((SeenMask & 4) != 0, KeepsakeNames[2]));
+            SetObjective(W("Remembering the past"), Check((SeenMask & 1) != 0, KeepsakeNames[0]) + Check((SeenMask & 2) != 0, KeepsakeNames[1]) + Check((SeenMask & 4) != 0, KeepsakeNames[2]));
         }
 
         // ---------------------------------------------------------------- the memories
@@ -129,11 +130,11 @@ namespace Mindscape.FamilyFinale
             Play(young, "Talk");
             foreach (var f in new[] { mother, father, tim }) HomeWelcome.Play(f, "Talk");
             yield return DialogueSequence(
-                Say("Mother", "Academic Achiever! Come here, let me see it."),
-                Say("Father", "All those late nights. We're proud of you."),
-                BeforeDialogue(Talking(tim), Say("Tim", "Can I hold it? I'll be careful!")),
-                BeforeDialogue(Talking(young), Me("I just tried my best.")),
-                BeforeDialogue(Talking(mother), Say("Mother", "And that's exactly what we're proud of.")));
+                Say(W("Mother"), W("Academic Achiever! Come here, let me see it.")),
+                Say(W("Father"), W("All those late nights. We're proud of you.")),
+                BeforeDialogue(Talking(tim), Say(W("Tim"), W("Can I hold it? I'll be careful!"))),
+                BeforeDialogue(Talking(young), Me(W("I just tried my best."))),
+                BeforeDialogue(Talking(mother), Say(W("Mother"), W("And that's exactly what we're proud of."))));
             foreach (var f in new[] { mother, father, tim }) HomeWelcome.Play(f, "Idle");
         }
 
@@ -144,10 +145,10 @@ namespace Mindscape.FamilyFinale
             drift = StartCoroutine(Glide(HomeWelcome.ClearView(eye, scenePoint - catchSide * 6.5f + catchStreet * 3.5f + Vector3.up * 5f), eye, 14f));
             yield return new WaitForSeconds(2.2f);
             yield return DialogueSequence(
-                Say("Justin", "Over here! Throw it to me!"),
-                Say("Aaron", "Nice catch, " + PlayerName + "!"),
-                Me("Again! Higher this time!"),
-                Think("We played until the streetlights came on. Nobody kept score."));
+                Say(W("Justin"), W("Over here! Throw it to me!")),
+                Say(W("Aaron"), W("Nice catch, ") + PlayerName + "!"),
+                Me(W("Again! Higher this time!")),
+                Think(W("We played until the streetlights came on. Nobody kept score.")));
         }
 
         IEnumerator Plans()
@@ -156,8 +157,8 @@ namespace Mindscape.FamilyFinale
             Vector3 head = young.position + Vector3.up * player.lossyScale.x * 1.3f;
             drift = StartCoroutine(Glide(head + Flat(keepsakes[2].position - head) * -1.6f + Vector3.up * 1.2f + Vector3.Cross(Vector3.up, Flat(keepsakes[2].position - head)) * 1.4f, keepsakes[2].position, 10f));
             yield return DialogueSequence(
-                Think("Plans: learn to draw comics. Join the science fair. See the ocean. Maybe become an engineer, or a pilot."),
-                Think("I wrote every idea down, as if every one of them was possible. Back then, it felt like they were."));
+                Think(W("Plans: learn to draw comics. Join the science fair. See the ocean. Maybe become an engineer, or a pilot.")),
+                Think(W("I wrote every idea down, as if every one of them was possible. Back then, it felt like they were.")));
         }
 
         // Batting practice while the memory plays: Joey pitches, Justin swings the bat and hits the ball out to Aaron,

@@ -27,7 +27,7 @@ public static class Episode1Builder
     };
 
     // ---------------------------------------------------------------- cutscene
-    [MenuItem("Mindscape/Chapter 2 - Family Expectations/Episode 1/Build Cutscene Slides")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 2 - Family Expectations/Episode 1/Build Cutscene Slides")]
     public static void BuildCutscene()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }
@@ -159,7 +159,7 @@ public static class Episode1Builder
             End("Goodbye, Tim."))
     }; }
 
-    [MenuItem("Mindscape/Chapter 2 - Family Expectations/Episode 1/Populate House NPCs")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 2 - Family Expectations/Episode 1/Populate House NPCs")]
     public static void PopulateNPCs()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }
@@ -265,7 +265,7 @@ public static class Episode1Wander
         new Route { npc = "Tim", pattern = NPCWander.Pattern.PingPong, xz = new[] { -21.5f, -5.0f,  -20.5f, -4.5f,  -21.5f, 2.5f } }
     };
 
-    [MenuItem("Mindscape/Chapter 2 - Family Expectations/Episode 1/Add NPC Wandering")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 2 - Family Expectations/Episode 1/Add NPC Wandering")]
     public static void Build()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }
@@ -398,7 +398,7 @@ public static class Episode1Minigames
         return c;
     }
 
-    [MenuItem("Mindscape/Chapter 2 - Family Expectations/Episode 1/Add Worry Courtroom and Breathing Screen")]
+    [MenuItem(LegacyBuilders.Root + "Chapter 2 - Family Expectations/Episode 1/Add Worry Courtroom and Breathing Screen")]
     public static void Build()
     {
         if (EditorApplication.isPlaying) { Debug.LogWarning("Exit Play mode first."); return; }
